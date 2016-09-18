@@ -48,7 +48,7 @@ public class SystemTests {
 				"http://localhost:" + this.port
 						+ "/webjars/bootstrap/3.3.5/css/bootstrap.min.css", String.class);
 		assertThat(entity.getStatusCode(), is(HttpStatus.OK));
-		assertThat(entity.getHeaders().getContentType(), is(MediaType.valueOf("text/css;charset=UTF-8")));
+		assertThat(entity.getHeaders().getContentType(), is(MediaType.valueOf("text/css")));
 		assertThat(entity.getBody(), containsString("body"));
 	}
 

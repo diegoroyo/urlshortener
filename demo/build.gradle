@@ -12,7 +12,7 @@ apply plugin: 'eclipse-wtp'
 
 eclipse {
    project {
-      name = 'UrlShortener2016.demo'
+      name = 'UrlShortener.demo'
    }
 }
 

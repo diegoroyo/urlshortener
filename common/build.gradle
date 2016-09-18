@@ -1,7 +1,7 @@
 // Common project specific stuff
 eclipse {
    project {
-      name = 'UrlShortener2016.common'
+      name = 'UrlShortener.common'
    }
 }
 
