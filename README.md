@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/UNIZAR-30246-WebEngineering/UrlShortener.svg?branch=master)](https://travis-ci.org/UNIZAR-30246-WebEngineering/UrlShortener)
 
-This is the shared repository for the project developed in this course. Go to the [wiki](wiki) to start your project.
+This is the shared repository for the project developed in this course. Go to the [wiki](../../wiki) to start your project.
 
 ## Projects
 
