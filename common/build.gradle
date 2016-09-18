@@ -1,0 +1,21 @@
+// Common project specific stuff
+eclipse {
+   project {
+      name = 'UrlShortener2016.common'
+   }
+}
+
+dependencies {
+    compile 'org.springframework.boot:spring-boot-starter-web:1.4.0.RELEASE'
+    compile 'org.springframework.boot:spring-boot-starter-jdbc:1.4.0.RELEASE'
+    compile 'org.springframework.hateoas:spring-hateoas:0.20.0.RELEASE'
+    compile 'org.springframework.plugin:spring-plugin-core:1.2.0.RELEASE'
+
+    compile 'commons-validator:commons-validator:1.5.1'
+	compile 'com.google.guava:guava:19.0'
+
+    testCompile 'org.springframework.boot:spring-boot-starter-test:1.4.0.RELEASE'
+    testCompile 'com.jayway.jsonpath:json-path:2.2.0'
+    testRuntime 'org.hsqldb:hsqldb:2.3.4'
+
+}

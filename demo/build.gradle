@@ -1,0 +1,33 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven { url "http://repo.spring.io/release" }
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.4.0.RELEASE")
+    }
+}
+apply plugin: "spring-boot"
+apply plugin: 'eclipse-wtp'
+
+eclipse {
+   project {
+      name = 'UrlShortener2016.demo'
+   }
+}
+
+dependencies {
+    compile project(':common')
+
+    // Provides the production database
+    runtime 'org.hsqldb:hsqldb'
+
+    // Provides java script libraries for static content
+    compile 'org.webjars:bootstrap:3.3.5'
+    compile 'org.webjars:jquery:2.1.4'    
+
+    // Testing framework
+    testCompile 'org.springframework.boot:spring-boot-starter-test'
+    testCompile 'org.apache.httpcomponents:httpclient:4.5.2'
+    testCompile 'com.jayway.jsonpath:json-path:2.2.0'
+}

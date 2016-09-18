@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>URL Shortener</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" type="text/css"
+	href="webjars/bootstrap/3.3.5/css/bootstrap.min.css" />
+<script type="text/javascript" src="webjars/jquery/2.1.4/jquery.min.js"></script>
+<script type="text/javascript"
+	src="webjars/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="js/app.js">
+</script>
+</head>
+<body>
+	<div class="container-full">
+		<div class="row">
+			<div class="col-lg-12 text-center">
+				<h1>URL Shortener</h1>
+				<p class="lead">A front-end example page for the project</p>
+				<br>
+				<form class="col-lg-12" role="form" id="shortener" action="">
+					<div class="input-group input-group-lg col-sm-offset-4 col-sm-4">
+						<input type="text" class="center-block form-control input-lg"
+							title="Enter a URL" placeholder="Enter a URL" name="url">
+						<span class="input-group-btn"><button
+								class="btn btn-lg btn-primary" type="submit">Short me!</button></span>
+					</div>
+				</form>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-lg-12 text-center">
+				<div class="col-sm-offset-4 col-sm-4 text-center">
+					<br />
+					<div id="result" />
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>
