@@ -38,7 +38,7 @@ public class SystemTests {
 		ResponseEntity<String> entity = new TestRestTemplate().getForEntity(
 				"http://localhost:" + this.port, String.class);
 		assertThat(entity.getStatusCode(), is(HttpStatus.OK));
-		assertThat(entity.getHeaders().getContentType(), is(new MediaType("text", "html", Charset.forName("UTF-8"))));
+		assertThat(entity.getHeaders().getContentType(), is(new MediaType("text", "html")));
 		assertThat(entity.getBody(), containsString("<title>URL"));
 	}
 
