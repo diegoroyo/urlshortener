@@ -23,6 +23,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 @RunWith(SpringRunner.class)
@@ -38,7 +39,7 @@ public class SystemTests {
 		ResponseEntity<String> entity = new TestRestTemplate().getForEntity(
 				"http://localhost:" + this.port, String.class);
 		assertThat(entity.getStatusCode(), is(HttpStatus.OK));
-		assertThat(entity.getHeaders().getContentType(), is(new MediaType("text", "html")));
+		assertTrue(entity.getHeaders().getContentType().isCompatibleWith(new MediaType("text", "html")));
 		assertThat(entity.getBody(), containsString("<title>URL"));
 	}
 
