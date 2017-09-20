@@ -1,10 +1,5 @@
 package urlshortener.common.repository;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Collections;
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -14,8 +9,10 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-
 import urlshortener.common.domain.ShortURL;
+
+import java.util.Collections;
+import java.util.List;
 
 @Repository
 public class ShortURLRepositoryImpl implements ShortURLRepository {
@@ -23,22 +20,14 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 	private static final Logger log = LoggerFactory
 			.getLogger(ShortURLRepositoryImpl.class);
 
-	private static final RowMapper<ShortURL> rowMapper = new RowMapper<ShortURL>() {
-		@Override
-		public ShortURL mapRow(ResultSet rs, int rowNum) throws SQLException {
-			return new ShortURL(rs.getString("hash"), rs.getString("target"),
-					null, rs.getString("sponsor"), rs.getDate("created"),
-					rs.getString("owner"), rs.getInt("mode"),
-					rs.getBoolean("safe"), rs.getString("ip"),
-					rs.getString("country"));
-		}
-	};
+	private static final RowMapper<ShortURL> rowMapper = (rs, rowNum) -> new ShortURL(rs.getString("hash"), rs.getString("target"),
+            null, rs.getString("sponsor"), rs.getDate("created"),
+            rs.getString("owner"), rs.getInt("mode"),
+            rs.getBoolean("safe"), rs.getString("ip"),
+            rs.getString("country"));
 
 	@Autowired
 	protected JdbcTemplate jdbc;
-
-	public ShortURLRepositoryImpl() {
-	}
 
 	public ShortURLRepositoryImpl(JdbcTemplate jdbc) {
 		this.jdbc = jdbc;
