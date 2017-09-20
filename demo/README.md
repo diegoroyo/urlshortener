@@ -1,6 +1,4 @@
 # Project "Demo"
-[![Build Status](https://travis-ci.org/UNIZAR-30246-WebEngineering/UrlShortener2015.svg)](https://travis-ci.org/UNIZAR-30246-WebEngineering/UrlShortener2015)
-
 
 This project is the template for the creation of projects. This project also will contain solutions for blocking issues.
 
