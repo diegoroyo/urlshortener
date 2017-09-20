@@ -7,6 +7,10 @@ eclipse {
 
 apply plugin: 'eclipse-wtp'
 
+bootRepackage {
+    enabled = false
+}
+
 dependencies {
     compile 'org.springframework.boot:spring-boot-starter-web'
     compile 'org.springframework.boot:spring-boot-starter-jdbc'
