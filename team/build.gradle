@@ -1,6 +1,5 @@
-// Common project specific stuff
 eclipse {
-    project {
-        name = 'UrlShortener.team'
-    }
+   project {
+      name = 'UrlShortener.team'
+   }
 }
