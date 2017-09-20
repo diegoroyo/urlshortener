@@ -1,3 +1,2 @@
-include ":common"
-include ":demo"
-include ":team"
+include 'common'
+include 'demo'

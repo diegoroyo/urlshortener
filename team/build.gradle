@@ -1,6 +1,0 @@
-// Common project specific stuff
-eclipse {
-    project {
-        name = 'UrlShortener.team'
-    }
-}
