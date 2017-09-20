@@ -3,3 +3,7 @@ eclipse {
       name = 'UrlShortener.team'
    }
 }
+
+dependencies {
+   compile project(':common')
+}
