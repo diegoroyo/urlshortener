@@ -5,8 +5,6 @@ eclipse {
    }
 }
 
-apply plugin: 'eclipse-wtp'
-
 bootRepackage {
     enabled = false
 }
