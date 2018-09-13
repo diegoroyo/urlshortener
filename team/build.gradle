@@ -1,9 +1,0 @@
-eclipse {
-   project {
-      name = 'UrlShortener.team'
-   }
-}
-
-dependencies {
-   compile project(':common')
-}

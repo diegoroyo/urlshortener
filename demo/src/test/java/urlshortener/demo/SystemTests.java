@@ -2,12 +2,13 @@ package urlshortener.demo;
 
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.ReadContext;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,9 @@ import org.springframework.util.MultiValueMap;
 import java.net.URI;
 import java.nio.charset.Charset;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
@@ -36,7 +39,7 @@ public class SystemTests {
 	private int port;
 
 	@Test
-	public void testHome() throws Exception {
+	public void testHome() {
 		ResponseEntity<String> entity = restTemplate.getForEntity("/", String.class);
 		assertThat(entity.getStatusCode(), is(HttpStatus.OK));
 		assertTrue(entity.getHeaders().getContentType().isCompatibleWith(new MediaType("text", "html")));
@@ -44,7 +47,7 @@ public class SystemTests {
 	}
 
 	@Test
-	public void testCss() throws Exception {
+	public void testCss() {
 		ResponseEntity<String> entity = restTemplate.getForEntity("/webjars/bootstrap/3.3.5/css/bootstrap.min.css", String.class);
 		assertThat(entity.getStatusCode(), is(HttpStatus.OK));
 		assertThat(entity.getHeaders().getContentType(), is(MediaType.valueOf("text/css")));

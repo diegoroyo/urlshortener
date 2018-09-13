@@ -4,15 +4,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.DirectFieldAccessor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-import urlshortener.common.domain.ShortURL;
 
 import java.util.Collections;
 import java.util.List;
+
+import urlshortener.common.domain.ShortURL;
 
 @Repository
 public class ShortURLRepositoryImpl implements ShortURLRepository {
@@ -26,8 +26,7 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
             rs.getBoolean("safe"), rs.getString("ip"),
             rs.getString("country"));
 
-	@Autowired
-	protected JdbcTemplate jdbc;
+	private JdbcTemplate jdbc;
 
 	public ShortURLRepositoryImpl(JdbcTemplate jdbc) {
 		this.jdbc = jdbc;
@@ -39,7 +38,7 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 			return jdbc.queryForObject("SELECT * FROM shorturl WHERE hash=?",
 					rowMapper, id);
 		} catch (Exception e) {
-			log.debug("When select for key " + id, e);
+			log.debug("When select for key {}", id, e);
 			return null;
 		}
 	}
@@ -52,7 +51,7 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 					su.getCreated(), su.getOwner(), su.getMode(), su.getSafe(),
 					su.getIP(), su.getCountry());
 		} catch (DuplicateKeyException e) {
-			log.debug("When insert for key " + su.getHash(), e);
+			log.debug("When insert for key {}",  su.getHash(), e);
 			return su;
 		} catch (Exception e) {
 			log.debug("When insert", e);
@@ -85,7 +84,7 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 					su.getOwner(), su.getMode(), su.getSafe(), su.getIP(),
 					su.getCountry(), su.getHash());
 		} catch (Exception e) {
-			log.debug("When update for hash " + su.getHash(), e);
+			log.debug("When update for hash {}",  su.getHash(), e);
 		}
 	}
 
@@ -94,7 +93,7 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 		try {
 			jdbc.update("delete from shorturl where hash=?", hash);
 		} catch (Exception e) {
-			log.debug("When delete for hash " + hash, e);
+			log.debug("When delete for hash {}",  hash, e);
 		}
 	}
 
@@ -115,9 +114,8 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
 			return jdbc.query("SELECT * FROM shorturl LIMIT ? OFFSET ?",
 					new Object[] { limit, offset }, rowMapper);
 		} catch (Exception e) {
-			log.debug("When select for limit " + limit + " and offset "
-					+ offset, e);
-			return null;
+			log.debug("When select for limit {} and offset {}", limit, offset, e);
+			return Collections.emptyList();
 		}
 	}
 

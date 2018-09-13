@@ -3,19 +3,20 @@ package urlshortener.common.repository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.DirectFieldAccessor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
-import urlshortener.common.domain.Click;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.sql.Types;
+import java.util.Collections;
 import java.util.List;
+
+import urlshortener.common.domain.Click;
 
 
 @Repository
@@ -29,8 +30,7 @@ public class ClickRepositoryImpl implements ClickRepository {
             rs.getString("browser"), rs.getString("platform"),
             rs.getString("ip"), rs.getString("country"));
 
-	@Autowired
-	protected JdbcTemplate jdbc;
+	private JdbcTemplate jdbc;
 
 	public ClickRepositoryImpl(JdbcTemplate jdbc) {
 		this.jdbc = jdbc;
@@ -43,7 +43,7 @@ public class ClickRepositoryImpl implements ClickRepository {
 					new Object[] { hash }, rowMapper);
 		} catch (Exception e) {
 			log.debug("When select for hash " + hash, e);
-			return null;
+			return Collections.emptyList();
 		}
 	}
 
@@ -66,8 +66,12 @@ public class ClickRepositoryImpl implements ClickRepository {
                 ps.setString(8, cl.getCountry());
                 return ps;
             }, holder);
-			new DirectFieldAccessor(cl).setPropertyValue("id", holder.getKey()
-					.longValue());
+			if (holder.getKey() != null) {
+				new DirectFieldAccessor(cl).setPropertyValue("id", holder.getKey()
+								.longValue());
+			} else {
+				log.debug("Key from database is null");
+			}
 		} catch (DuplicateKeyException e) {
 			log.debug("When insert for click with id " + cl.getId(), e);
 			return cl;
@@ -80,7 +84,7 @@ public class ClickRepositoryImpl implements ClickRepository {
 
 	@Override
 	public void update(Click cl) {
-		log.info("ID2: "+cl.getId()+"navegador: "+cl.getBrowser()+" SO: "+cl.getPlatform()+" Date:"+cl.getCreated());
+		log.info("ID2: {} navegador: {} SO: {} Date: {}", cl.getId(), cl.getBrowser(), cl.getPlatform(), cl.getCreated());
 		try {
 			jdbc.update(
 					"update click set hash=?, created=?, referrer=?, browser=?, platform=?, ip=?, country=? where id=?",
@@ -130,7 +134,7 @@ public class ClickRepositoryImpl implements ClickRepository {
 		} catch (Exception e) {
 			log.debug("When select for limit " + limit + " and offset "
 					+ offset, e);
-			return null;
+			return Collections.emptyList();
 		}
 	}
 
