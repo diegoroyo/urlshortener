@@ -45,7 +45,7 @@ $ curl -v -d "url=http://www.unizar.es/" -X POST http://localhost:8080/link
 
 And now, we can navigate to the shortened URL.
 
-```
+```bash
 $ curl -v http://localhost:8080/6bb9db44
 > GET /6bb9db44 HTTP/1.1
 > User-Agent: curl/7.37.1
