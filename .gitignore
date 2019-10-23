@@ -19,3 +19,4 @@ out/
 # Other
 
 db/
+application.properties
