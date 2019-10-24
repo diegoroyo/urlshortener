@@ -39,14 +39,13 @@ public class UrlShortenerController {
 
     @RequestMapping(value = "/link", method = RequestMethod.POST)
     public ResponseEntity<ShortURL> shortener(@RequestParam("url") String url,
-                                              @RequestParam(value = "sponsor", required = false) String sponsor,
                                               HttpServletRequest request) {
         UrlValidator urlValidator = new UrlValidator(new String[]{"http",
                 "https"});
         if (urlValidator.isValid(url)) {
-            ShortURL su = shortUrlService.save(url, sponsor, request.getRemoteAddr());
+            ShortURL su = shortUrlService.save(url, request.getRemoteAddr());
             HttpHeaders h = new HttpHeaders();
-            h.setLocation(su.getUri());
+            h.setLocation(new URI(url));
             return new ResponseEntity<>(su, h, HttpStatus.CREATED);
         } else {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
