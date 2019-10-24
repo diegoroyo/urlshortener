@@ -7,12 +7,11 @@ DROP TABLE IF EXISTS SHORTURL;
 
 CREATE TABLE SHORTURL
 (
-    HASH    VARCHAR(30) CONSTRAINT shorturl_pk PRIMARY KEY, -- Key
+    ID      VARCHAR(256) CONSTRAINT shorturl_pk PRIMARY KEY, -- Key
     TARGET  VARCHAR(1024),           -- Original URL
-    SPONSOR VARCHAR(1024),           -- Sponsor URL
     CREATED TIMESTAMP,               -- Creation date
-    OWNER   VARCHAR(255),            -- User id
     MODE    INTEGER,                 -- Redirect mode
+    ACTIVE  BOOLEAN,                 -- Active URL
     SAFE    BOOLEAN,                 -- Safe target
     IP      VARCHAR(20),             -- IP
     COUNTRY VARCHAR(50)              -- Country
@@ -23,7 +22,7 @@ CREATE TABLE SHORTURL
 CREATE TABLE CLICK
 (
     ID       BIGINT CONSTRAINT click_pk PRIMARY KEY,                                             -- KEY
-    HASH     VARCHAR(10) REFERENCES SHORTURL(HASH), -- Foreing key
+    HASH     VARCHAR(256) REFERENCES SHORTURL(ID), -- Foreign key
     CREATED  TIMESTAMP,                                                   -- Creation date
     REFERRER VARCHAR(1024),                                               -- Traffic origin
     BROWSER  VARCHAR(50),                                                 -- Browser
