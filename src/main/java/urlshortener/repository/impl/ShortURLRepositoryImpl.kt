@@ -1,5 +1,6 @@
 package urlshortener.repository.impl;
 
+/*
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -18,7 +19,7 @@ public class ShortURLRepositoryImpl : ShortURLRepository {
 
     private val log = LoggerFactory.getLogger(ClickRepositoryImpl::class.java)
 
-    val rowMapper :RowMapper<ShortURL> = (rs: ResultSet, rowNum: Int) -> Click(rs.getLong("id"), rs.getString("target"),
+    val rowMapper :RowMapper<ShortURL> = (rs: ResultSet, rowNum: Int) -> ShortURL(rs.getLong("id"), rs.getString("target"),
         rs.getString("created"), rs.getString("mode"),
         rs.getString("safe"), rs.getString("ip"), rs.getString("country"))
     
@@ -128,3 +129,5 @@ public class ShortURLRepositoryImpl : ShortURLRepository {
         }
     }
 }
+
+*/

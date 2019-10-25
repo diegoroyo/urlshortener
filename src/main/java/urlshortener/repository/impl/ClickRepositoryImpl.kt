@@ -1,5 +1,5 @@
 package urlshortener.repository.impl;
-
+/* 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.DirectFieldAccessor;
@@ -18,25 +18,19 @@ import java.sql.Statement;
 import java.sql.Types;
 
 @Repository
-public class ClickRepositoryImpl : ClickRepository {
+public class ClickRepositoryImpl(val jdbc: JdbcTemplate) : ClickRepository {
 
     private val log = LoggerFactory.getLogger(ClickRepositoryImpl::class.java)
     
-    private val rowMapper :RowMapper<Click> = (rs, rowNum) -> Click(rs.getLong("id"), rs.getString("hash"),
+    private val rowMapper :RowMapper<Click> = (rs: ResultSet, rowNum: Int) -> Click(rs.getLong("id"), rs.getString("hash"),
             rs.getDate("created"), rs.getString("referrer"),
             rs.getString("browser"), rs.getString("platform"),
             rs.getString("ip"), rs.getString("country"));
-
-    val jdbc: JdbcTemplate
-
-    constructor(jdbc: JdbcTemplate) : ClickRepositoryImpl {
-        this.jdbc = jdbc;
-    }
     
     override fun findByHash(hash:String) : List<Click>  {
         var list: List<Click> = emptyList()
         try {
-            return jdbc.query("SELECT * FROM click WHERE hash=?", mutableListOf(<kotlin.Any>(hash)) as List<Click>;
+            return jdbc.query("SELECT * FROM click WHERE hash=?", mutableListOf(<kotlin.Any>(hash));
         } 
         catch (e: Exception) {
             log.debug("When select for hash " + hash, e);
@@ -44,12 +38,10 @@ public class ClickRepositoryImpl : ClickRepository {
         }
     }
 
-    
-    
     override fun save(cl: Click) :Click? {
         try {
             var holder: KeyHolder = GeneratedKeyHolder();
-            jdbc.update(conn -> var ps :PreparedStatement::class.java = conn.prepareStatement("INSERT INTO CLICK VALUES (?, ?, ?, ?, ?, ?, ?, ?)",Statement.RETURN_GENERATED_KEYS)
+            jdbc.update(conn -> {var ps :PreparedStatement = conn.prepareStatement("INSERT INTO CLICK VALUES (?, ?, ?, ?, ?, ?, ?, ?)",Statement.RETURN_GENERATED_KEYS)
                 ps.setNull(1, Types.BIGINT)
                 ps.setString(2, cl.hash)
                 ps.setDate(3, cl.created)
@@ -58,7 +50,7 @@ public class ClickRepositoryImpl : ClickRepository {
                 ps.setString(6, cl.platform)
                 ps.setString(7, cl.ip);
                 ps.setString(8, cl.country)
-                return ps
+                return ps }
             , holder)
             if (holder.getKey() != null) {
                 DirectFieldAccessor(cl).setPropertyValue("id", holder.getKey().longValue())
@@ -149,3 +141,5 @@ public class ClickRepositoryImpl : ClickRepository {
     }
 
 }
+
+*/

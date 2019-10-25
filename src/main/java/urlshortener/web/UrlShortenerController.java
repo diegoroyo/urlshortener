@@ -11,6 +11,7 @@ import urlshortener.service.ShortURLService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
+import java.net.URISyntaxException;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
@@ -37,9 +38,10 @@ public class UrlShortenerController {
         }
     }
 
+    // TODO eliminar throws URISyntaxException
     @RequestMapping(value = "/link", method = RequestMethod.POST)
     public ResponseEntity<ShortURL> shortener(@RequestParam("url") String url,
-                                              HttpServletRequest request) {
+                                              HttpServletRequest request) throws URISyntaxException {
         UrlValidator urlValidator = new UrlValidator(new String[]{"http",
                 "https"});
         if (urlValidator.isValid(url)) {

@@ -20,11 +20,9 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
     private static final Logger log = LoggerFactory
             .getLogger(ShortURLRepositoryImpl.class);
 
-    private static final RowMapper<ShortURL> rowMapper = (rs, rowNum) -> new ShortURL(rs.getString("hash"), rs.getString("target"),
-            null, rs.getString("sponsor"), rs.getDate("created"),
-            rs.getString("owner"), rs.getInt("mode"),
-            rs.getBoolean("safe"), rs.getString("ip"),
-            rs.getString("country"));
+    private static final RowMapper<ShortURL> rowMapper = (rs, rowNum) -> new ShortURL(rs.getString("id"), rs.getString("target"),
+        rs.getDate("created"), rs.getInt("mode"), rs.getBoolean("active"),
+        rs.getBoolean("safe"), rs.getString("ip"), rs.getString("country"));
 
     private JdbcTemplate jdbc;
 
@@ -46,12 +44,12 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
     @Override
     public ShortURL save(ShortURL su) {
         try {
-            jdbc.update("INSERT INTO shorturl VALUES (?,?,?,?,?,?,?,?,?)",
-                    su.getHash(), su.getTarget(), su.getSponsor(),
-                    su.getCreated(), su.getOwner(), su.getMode(), su.getSafe(),
+            jdbc.update("INSERT INTO shorturl VALUES (?,?,?,?,?,?,?,?)",
+                    su.getId(), su.getTarget(),
+                    su.getCreated(), su.getMode(), su.getActive(), su.getSafe(),
                     su.getIP(), su.getCountry());
         } catch (DuplicateKeyException e) {
-            log.debug("When insert for key {}", su.getHash(), e);
+            log.debug("When insert for key {}", su.getId(), e);
             return su;
         } catch (Exception e) {
             log.debug("When insert", e);
@@ -63,8 +61,8 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
     @Override
     public ShortURL mark(ShortURL su, boolean safeness) {
         try {
-            jdbc.update("UPDATE shorturl SET safe=? WHERE hash=?", safeness,
-                    su.getHash());
+            jdbc.update("UPDATE shorturl SET safe=? WHERE id=?", safeness,
+                    su.getId());
             ShortURL res = new ShortURL();
             BeanUtils.copyProperties(su, res);
             new DirectFieldAccessor(res).setPropertyValue("safe", safeness);
@@ -79,12 +77,12 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
     public void update(ShortURL su) {
         try {
             jdbc.update(
-                    "update shorturl set target=?, sponsor=?, created=?, owner=?, mode=?, safe=?, ip=?, country=? where hash=?",
-                    su.getTarget(), su.getSponsor(), su.getCreated(),
-                    su.getOwner(), su.getMode(), su.getSafe(), su.getIP(),
-                    su.getCountry(), su.getHash());
+                    "update shorturl set target=?, created=?, mode=?, active=?, safe=?, ip=?, country=? where id=?",
+                    su.getTarget(), su.getCreated(),
+                    su.getMode(), su.getActive(), su.getSafe(), su.getIP(),
+                    su.getCountry(), su.getId());
         } catch (Exception e) {
-            log.debug("When update for hash {}", su.getHash(), e);
+            log.debug("When update for hash {}", su.getId(), e);
         }
     }
 

@@ -8,16 +8,16 @@ import urlshortener.web.UrlShortenerController;
 @Service
 public class ShortURLService(private val shortURLRepository: ShortURLRepository) {
 
-    public fun findByKey(id: String) : ShortURL = shortURLRepository.findByKey(id);
+    public fun findByKey(id: String) : ShortURL? = shortURLRepository.findByKey(id);
 
-    public fun save(url: String, ip: String) : ShortURL {
-        val su: ShortURL = ShortURLBuilder()
+    public fun save(url: String, ip: String) : ShortURL? {
+        val su: ShortURL? = ShortURLBuilder()
                 .target(url)
                 .createdNow()
                 .temporaryRedirect()
                 .ip(ip)
                 .unknownCountry() // TODO
                 .build();
-        return shortURLRepository.save(su);
+        return shortURLRepository.save(su!!);
     }
 }

@@ -20,6 +20,6 @@ public interface ShortURLRepository {
 
     public fun count() :Long?
 
-    public fun list(limit: Long, offset: Long) :List<ShortURL>
+    public fun list(limit: Long?, offset: Long?) :List<ShortURL>?
 
 }
