@@ -10,9 +10,9 @@ $(document).ready(
                     success: function (msg) {
                         $("#result").html(
                             "<div class='alert alert-success lead'><a target='_blank' href='"
-                            + msg.uri
+                            + 'http://localhost:8080/' + msg.id
                             + "'>"
-                            + msg.uri
+                            + 'http://localhost:8080/' + msg.id
                             + "</a></div>");
                     },
                     error: function () {

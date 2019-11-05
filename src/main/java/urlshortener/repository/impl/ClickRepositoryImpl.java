@@ -25,7 +25,7 @@ public class ClickRepositoryImpl implements ClickRepository {
     private static final Logger log = LoggerFactory
             .getLogger(ClickRepositoryImpl.class);
 
-    private static final RowMapper<Click> rowMapper = (rs, rowNum) -> new Click(rs.getLong("id"), rs.getString("hash"),
+    private static final RowMapper<Click> rowMapper = (rs, rowNum) -> new Click(rs.getLong("clickId"), rs.getString("shortId"),
             rs.getDate("created"), rs.getString("referrer"),
             rs.getString("browser"), rs.getString("platform"),
             rs.getString("ip"), rs.getString("country"));
@@ -37,12 +37,12 @@ public class ClickRepositoryImpl implements ClickRepository {
     }
 
     @Override
-    public List<Click> findByHash(String hash) {
+    public List<Click> findByShortURL(String id) {
         try {
-            return jdbc.query("SELECT * FROM click WHERE hash=?",
-                    new Object[]{hash}, rowMapper);
+            return jdbc.query("SELECT * FROM click WHERE shortId=?",
+                    new Object[]{id}, rowMapper);
         } catch (Exception e) {
-            log.debug("When select for hash " + hash, e);
+            log.debug("When select for shortId " + id, e);
             return Collections.emptyList();
         }
     }
@@ -57,7 +57,7 @@ public class ClickRepositoryImpl implements ClickRepository {
                                 "INSERT INTO CLICK VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                                 Statement.RETURN_GENERATED_KEYS);
                 ps.setNull(1, Types.BIGINT);
-                ps.setString(2, cl.getHash());
+                ps.setString(2, cl.getShortId());
                 ps.setDate(3, cl.getCreated());
                 ps.setString(4, cl.getReferrer());
                 ps.setString(5, cl.getBrowser());
@@ -67,13 +67,13 @@ public class ClickRepositoryImpl implements ClickRepository {
                 return ps;
             }, holder);
             if (holder.getKey() != null) {
-                new DirectFieldAccessor(cl).setPropertyValue("id", holder.getKey()
+                new DirectFieldAccessor(cl).setPropertyValue("clickId", holder.getKey()
                         .longValue());
             } else {
                 log.debug("Key from database is null");
             }
         } catch (DuplicateKeyException e) {
-            log.debug("When insert for click with id " + cl.getId(), e);
+            log.debug("When insert for click with clickId " + cl.getClickId(), e);
             return cl;
         } catch (Exception e) {
             log.debug("When insert a click", e);
@@ -84,23 +84,23 @@ public class ClickRepositoryImpl implements ClickRepository {
 
     @Override
     public void update(Click cl) {
-        log.info("ID2: {} navegador: {} SO: {} Date: {}", cl.getId(), cl.getBrowser(), cl.getPlatform(), cl.getCreated());
+        log.info("ID2: {} navegador: {} SO: {} Date: {}", cl.getClickId(), cl.getBrowser(), cl.getPlatform(), cl.getCreated());
         try {
             jdbc.update(
-                    "update click set hash=?, created=?, referrer=?, browser=?, platform=?, ip=?, country=? where id=?",
-                    cl.getHash(), cl.getCreated(), cl.getReferrer(),
+                    "update click set shortId=?, created=?, referrer=?, browser=?, platform=?, ip=?, country=? where clickId=?",
+                    cl.getShortId(), cl.getCreated(), cl.getReferrer(),
                     cl.getBrowser(), cl.getPlatform(), cl.getIp(),
-                    cl.getCountry(), cl.getId());
+                    cl.getCountry(), cl.getClickId());
 
         } catch (Exception e) {
-            log.info("When update for id " + cl.getId(), e);
+            log.info("When update for clickId " + cl.getClickId(), e);
         }
     }
 
     @Override
     public void delete(Long id) {
         try {
-            jdbc.update("delete from click where id=?", id);
+            jdbc.update("delete from click where clickId=?", id);
         } catch (Exception e) {
             log.debug("When delete for id " + id, e);
         }
@@ -139,12 +139,12 @@ public class ClickRepositoryImpl implements ClickRepository {
     }
 
     @Override
-    public Long clicksByHash(String hash) {
+    public Long clicksByShortURL(String id) {
         try {
             return jdbc
-                    .queryForObject("select count(*) from click where hash = ?", new Object[]{hash}, Long.class);
+                    .queryForObject("select count(*) from click where shortId = ?", new Object[]{id}, Long.class);
         } catch (Exception e) {
-            log.debug("When counting hash " + hash, e);
+            log.debug("When counting shortId " + id, e);
         }
         return -1L;
     }

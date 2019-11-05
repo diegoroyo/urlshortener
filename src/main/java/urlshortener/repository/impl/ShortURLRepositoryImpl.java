@@ -33,7 +33,7 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
     @Override
     public ShortURL findByKey(String id) {
         try {
-            return jdbc.queryForObject("SELECT * FROM shorturl WHERE hash=?",
+            return jdbc.queryForObject("SELECT * FROM shorturl WHERE id=?",
                     rowMapper, id);
         } catch (Exception e) {
             log.debug("When select for key {}", id, e);
@@ -82,16 +82,16 @@ public class ShortURLRepositoryImpl implements ShortURLRepository {
                     su.getMode(), su.getActive(), su.getSafe(), su.getIP(),
                     su.getCountry(), su.getId());
         } catch (Exception e) {
-            log.debug("When update for hash {}", su.getId(), e);
+            log.debug("When update for id {}", su.getId(), e);
         }
     }
 
     @Override
-    public void delete(String hash) {
+    public void delete(String id) {
         try {
-            jdbc.update("delete from shorturl where hash=?", hash);
+            jdbc.update("delete from shorturl where id=?", id);
         } catch (Exception e) {
-            log.debug("When delete for hash {}", hash, e);
+            log.debug("When delete for id {}", id, e);
         }
     }
 

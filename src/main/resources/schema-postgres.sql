@@ -21,7 +21,7 @@ CREATE TABLE SHORTURL
 
 CREATE TABLE CLICK
 (
-    CLICKID BIGINT CONSTRAINT click_pk PRIMARY KEY,                       -- KEY
+    CLICKID  BIGINT CONSTRAINT click_pk PRIMARY KEY,                      -- KEY
     SHORTID  VARCHAR(256) REFERENCES SHORTURL(ID), -- Foreign key
     CREATED  TIMESTAMP,                                                   -- Creation date
     REFERRER VARCHAR(1024),                                               -- Traffic origin

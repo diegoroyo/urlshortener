@@ -6,9 +6,9 @@ import kotlin.collections.List;
 
 public interface ClickRepository {
 
-    public fun findByHash(hash: String) :List<Click>?
+    public fun findByShortURL(id: String) :List<Click>?
 
-    public fun clicksByHash(hash: String) :Long?
+    public fun clicksByShortURL(id: String) :Long?
 
     public fun save(cl: Click) : Click?
 

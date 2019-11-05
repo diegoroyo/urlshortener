@@ -32,9 +32,13 @@ public class ShortURLBuilder {
         country
     );
 
-    public fun target(url: String) : ShortURLBuilder {
+    public fun target(url: String, vanity: String? = null) : ShortURLBuilder {
         this.target = url;
-        this.id = Hashing.murmur3_32().hashString(url, StandardCharsets.UTF_8).toString();
+        if (vanity.isNullOrBlank()) {
+            this.id = Hashing.murmur3_32().hashString(url, StandardCharsets.UTF_8).toString();
+        } else {
+            this.id = vanity;
+        }
         return this;
     }
 

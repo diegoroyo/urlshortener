@@ -10,9 +10,9 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
 
     public fun findByKey(id: String) : ShortURL? = shortURLRepository.findByKey(id);
 
-    public fun save(url: String, ip: String) : ShortURL? {
+    public fun save(url: String, ip: String, vanity: String? = null) : ShortURL? {
         val su: ShortURL? = ShortURLBuilder()
-                .target(url)
+                .target(url, vanity)
                 .createdNow()
                 .temporaryRedirect()
                 .ip(ip)
@@ -20,4 +20,5 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
                 .build();
         return shortURLRepository.save(su!!);
     }
+
 }
