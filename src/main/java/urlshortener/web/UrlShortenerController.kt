@@ -58,14 +58,26 @@ class UrlShortenerController(private val shortUrlService: ShortURLService, priva
     @GetMapping("/qr")
     fun generateQr(@RequestParam(value = "url", required = true) url: String,
                    request: HttpServletRequest): ResponseEntity<String> {
-        // TODO verificar que la URI acortada es valida y existe en la BBDD ademas
-        // val urlValidator = UrlValidator(arrayOf("http", "https"));
-        // if (urlValidator.isValid(url)) {
+        // TODO sustituir localhost
+        val start: String = "http://localhost:8080/"
+        if (url.startsWith(start) &&
+            shortUrlService.findByKey(url.substring(start.length)) != null) {
             val qrImage: String = shortUrlService.generateQR(url);
             return ResponseEntity<String>(qrImage, HttpStatus.OK);
-        // } else {
-        //     return ResponseEntity<String>(HttpStatus.NOT_FOUND);
-        // }
+        } else {
+            return ResponseEntity<String>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/statistics")
+    fun generateQr(@RequestParam(value = "short", required = true) short: String,
+                   request: HttpServletRequest): ResponseEntity<List<Click>> {
+        val clickList = clickService.getClicksFromURL(short)
+        if (clickList != null) {
+            return ResponseEntity<List<Click>>(clickList, HttpStatus.OK);
+        } else {
+            return ResponseEntity<List<Click>>(HttpStatus.NOT_FOUND);
+        }
     }
 
 }

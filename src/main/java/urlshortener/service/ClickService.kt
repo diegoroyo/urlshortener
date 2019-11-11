@@ -11,13 +11,17 @@ import java.sql.Date;
 @Service
 public class ClickService(private val clickRepository: ClickRepository) {
 
-    private val log: Logger = LoggerFactory.getLogger(ClickService::class.java);
+    private val log: Logger = LoggerFactory.getLogger(ClickService::class.java)
 
     public fun saveClick(shortId: String, ip: String) {
-        var cl: Click? = ClickBuilder().shortId(shortId).createdNow().ip(ip).build();
-        cl = clickRepository.save(cl!!);
+        var cl: Click? = ClickBuilder().shortId(shortId).createdNow().ip(ip).build()
+        cl = clickRepository.save(cl!!)
         // TODO check why cl.getId() doesnt work
-        log.info(if (cl != null) "[" + shortId + "] saved with id [ -- no id -- ]" else "[" + shortId + "] was not saved");
+        log.info(if (cl != null) "[" + shortId + "] saved with id [ -- no id -- ]" else "[" + shortId + "] was not saved")
+    }
+
+    public fun getClicksFromURL(shortId: String) : List<Click>? {
+        return clickRepository.getClicksFromURLshortId)
     }
 
 }
