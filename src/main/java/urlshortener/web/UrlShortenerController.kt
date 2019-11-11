@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 import urlshortener.domain.ShortURL
+import urlshortener.domain.Click
 import urlshortener.service.ClickService
 import urlshortener.service.ShortURLService
 import java.net.URI
@@ -70,7 +71,7 @@ class UrlShortenerController(private val shortUrlService: ShortURLService, priva
     }
 
     @GetMapping("/statistics")
-    fun generateQr(@RequestParam(value = "short", required = true) short: String,
+    fun getStatistics(@RequestParam(value = "short", required = true) short: String,
                    request: HttpServletRequest): ResponseEntity<List<Click>> {
         val clickList = clickService.getClicksFromURL(short)
         if (clickList != null) {

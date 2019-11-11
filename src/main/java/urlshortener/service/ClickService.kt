@@ -21,7 +21,7 @@ public class ClickService(private val clickRepository: ClickRepository) {
     }
 
     public fun getClicksFromURL(shortId: String) : List<Click>? {
-        return clickRepository.getClicksFromURLshortId)
+        return clickRepository.findByShortURL(shortId)
     }
 
 }

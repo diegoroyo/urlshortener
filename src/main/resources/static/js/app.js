@@ -38,7 +38,37 @@ function eventShortUrl(event) {
     });
 };
 
+function eventStatistics(event) {
+    event.preventDefault();
+    $.ajax({
+        type: "GET",
+        url: "/statistics",
+        data: "short='" + $(this).serializeArray()[0].value + "'",
+        success: function (msg) {
+            $("#statistics-table").className = "table-responsive";
+            var table = '';
+            msg.forEach(function (click) {
+                table += "<tr>"
+                    + "<th scope=\"row\">" + click.clickId + "</th>"
+                    + "<td>" + click.created + "</td>"
+                    + "<td>" + click.referrer + "</td>"
+                    + "<td>" + click.browser + "</td>"
+                    + "<td>" + click.platform + "</td>"
+                    + "<td>" + click.ip + "</td>"
+                    + "<td>" + click.country + "</td>"
+                    + "</tr>"
+            })
+            $("#statistics-rows").html(table);
+        },
+        error: function () {
+            $("#resultQR").html(
+                "<div class='alert alert-danger lead'>STATISTICS ERROR</div>");
+        }
+    });
+};
+
 $(document).ready(
     function () {
         $("#shortener").submit(eventShortUrl)
+        $("#statistics").submit(eventStatistics)
     });
