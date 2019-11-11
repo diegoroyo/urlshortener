@@ -27,7 +27,7 @@ class UrlShortenerController(private val shortUrlService: ShortURLService, priva
                  @RequestParam(value = "vanity", required = false) vanity: String?,
                  request: HttpServletRequest): ResponseEntity<ShortURL> {
         val urlValidator = UrlValidator(arrayOf("http", "https"));
-        if (urlValidator.isValid(url)) {
+        if (urlValidator.isValid(url) && shortUrlService.checkSafeBrowsing(url)) {
             val su = if (vanity.isNullOrBlank()) {
                 shortUrlService.save(url, request.getRemoteAddr());
             } else {
@@ -51,9 +51,21 @@ class UrlShortenerController(private val shortUrlService: ShortURLService, priva
             h.setLocation(URI.create(l.target));
             return ResponseEntity<Unit>(h, HttpStatus.valueOf(l.mode!!));
         } else {
-            println("NO ENCONTRADO")
             return ResponseEntity<Unit>(HttpStatus.NOT_FOUND);
         }
+    }
+
+    @GetMapping("/qr")
+    fun generateQr(@RequestParam(value = "url", required = true) url: String,
+                   request: HttpServletRequest): ResponseEntity<String> {
+        // TODO verificar que la URI acortada es valida y existe en la BBDD ademas
+        // val urlValidator = UrlValidator(arrayOf("http", "https"));
+        // if (urlValidator.isValid(url)) {
+            val qrImage: String = shortUrlService.generateQR(url);
+            return ResponseEntity<String>(qrImage, HttpStatus.OK);
+        // } else {
+        //     return ResponseEntity<String>(HttpStatus.NOT_FOUND);
+        // }
     }
 
 }
