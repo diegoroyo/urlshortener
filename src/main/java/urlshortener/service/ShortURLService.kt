@@ -91,7 +91,7 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
 
     
 
-    public fun checkSafeBrowsing(url: String) {
+    public fun checkSafeBrowsing(url: String) : Boolean {
         val mapClient = mapOf("clientId" to "es.unizar.urlshortener", "clientVersion" to "1.0.0")
         val mapThreatInfo = mapOf("threatTypes" to listOf<String>("MALWARE", "SOCIAL_ENGINEERING"),
                                   "platformTypes" to listOf<String>("WINDOWS"),
@@ -100,7 +100,8 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
         print(mapOf("client" to mapClient, "threatInfo" to mapThreatInfo).toString());
         var r = post("https://safebrowsing.googleapis.com/v4/threatMatches:find?key=$safeBrowsingKey",
             data = JSONObject(mapOf("client" to mapClient, "threatInfo" to mapThreatInfo)));
-        return r.text == '{}'
+        print(r.text)
+        return true
     }
 
 }

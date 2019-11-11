@@ -9,22 +9,16 @@ import urlshortener.repository.impl.ClickRepositoryImpl;
 import urlshortener.repository.impl.ShortURLRepositoryImpl;
 
 @Configuration
-public class PersistenceConfiguration {
+public class PersistenceConfiguration(val jdbc: JdbcTemplate) {
 
-    private final JdbcTemplate jdbc;
-
-    public PersistenceConfiguration(JdbcTemplate jdbc) {
-        this.jdbc = jdbc;
+    @Bean
+    fun shortURLRepository() : ShortURLRepository {
+        return ShortURLRepositoryImpl(jdbc);
     }
 
     @Bean
-    ShortURLRepository shortURLRepository() {
-        return new ShortURLRepositoryImpl(jdbc);
-    }
-
-    @Bean
-    ClickRepository clickRepository() {
-        return new ClickRepositoryImpl(jdbc);
+    fun clickRepository() : ClickRepository {
+        return ClickRepositoryImpl(jdbc);
     }
 
 }

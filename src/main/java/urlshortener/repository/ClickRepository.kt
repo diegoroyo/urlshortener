@@ -6,9 +6,7 @@ import kotlin.collections.List;
 
 public interface ClickRepository {
 
-    public fun findByShortURL(id: String) :List<Click>?
-
-    public fun clicksByShortURL(id: String) :Long?
+    public fun findByShortURL(id: String) : List<Click>?
 
     public fun save(cl: Click) : Click?
 
@@ -16,9 +14,9 @@ public interface ClickRepository {
 
     public fun delete(id: Long?)
 
-    public fun deleteAll();
+    public fun deleteAll()
 
-    public fun count() :Long?
+    public fun count() : Long?
 
-    public fun list(limit: Long?, offset: Long?) :List<Click>?
+    public fun list(limit: Long?, offset: Long?) : List<Click>?
 }

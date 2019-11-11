@@ -6,7 +6,7 @@ import java.sql.Date;
 
 public class ClickBuilder {
 
-    private var hash: String? = null;
+    private var shortId: String? = null;
     private var created: Date? = null;
     private var referrer: String? = null;
     private var browser: String? = null;
@@ -16,7 +16,7 @@ public class ClickBuilder {
 
     public fun build() = Click(
         null,
-        hash,
+        shortId,
         created,
         referrer,
         browser,
@@ -25,8 +25,8 @@ public class ClickBuilder {
         country
     );
 
-    public fun hash(hash: String) : ClickBuilder {
-        this.hash = hash;
+    public fun shortId(shortId: String) : ClickBuilder {
+        this.shortId = shortId;
         return this;
     }
 
