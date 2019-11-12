@@ -35,7 +35,7 @@ public class ClickRepositoryImpl(val jdbc: JdbcTemplate) : ClickRepository {
 
     override fun findByShortURL(id: String) : List<Click>? {
         try {
-            return jdbc.query("SELECT * FROM click WHERE shortId=?", rowMapper, mutableListOf<String>(id)) as List<Click>
+            return jdbc.query("SELECT * FROM click WHERE shortId=?", rowMapper, id)
         } 
         catch (e: Exception) {
             log.debug("When select for shortId " + id, e);
@@ -44,33 +44,31 @@ public class ClickRepositoryImpl(val jdbc: JdbcTemplate) : ClickRepository {
     }
 
     override fun save(cl: Click) : Click? {
-        println("a savear")
         try {
             var holder: KeyHolder = GeneratedKeyHolder();
             jdbc.update(
                 { 
                     conn -> 
                     var ps: PreparedStatement = conn.prepareStatement(
-                            "INSERT INTO CLICK VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                            "INSERT INTO CLICK (shortid, created, referrer, browser, platform, ip, country)"
+                            + "VALUES (?, ?, ?, ?, ?, ?, ?)",
                             Statement.RETURN_GENERATED_KEYS)
-                    ps.setNull(1, Types.BIGINT)
-                    ps.setString(2, cl.shortId)
-                    ps.setDate(3, cl.created)
-                    ps.setString(4, cl.referrer)
-                    ps.setString(5, cl.browser)
-                    ps.setString(6, cl.platform)
-                    ps.setString(7, cl.ip)
-                    ps.setString(8, cl.country)
+                    ps.setString(1, cl.shortId)
+                    ps.setDate(2, cl.created)
+                    ps.setString(3, cl.referrer)
+                    ps.setString(4, cl.browser)
+                    ps.setString(5, cl.platform)
+                    ps.setString(6, cl.ip)
+                    ps.setString(7, cl.country)
                     ps
                 },
                 holder)
-            if (holder.getKey() != null) {
-                DirectFieldAccessor(cl).setPropertyValue("clickId", holder.getKey()!!.toLong())
+            if (holder.getKeys() != null) {
+                DirectFieldAccessor(cl).setPropertyValue("clickId", (holder.getKeys()!!.get("clickId") as Number).toLong())
             }
             else {
                 log.debug("Key from database is null")
             }
-            println("a dfsjfjsavear")
         } 
         catch (e: DuplicateKeyException) {
             log.debug("When insert for click with clickId " + cl.clickId, e)
@@ -78,12 +76,9 @@ public class ClickRepositoryImpl(val jdbc: JdbcTemplate) : ClickRepository {
         } 
         catch (e: Exception) {
             log.debug("When insert a click", e)
-            print("excepcion!!!!")
             println(e)
             return null
         }
-        print("su click!!!!")
-        println(cl)
         return cl
     }
 

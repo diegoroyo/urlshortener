@@ -16,8 +16,7 @@ public class ClickService(private val clickRepository: ClickRepository) {
     public fun saveClick(shortId: String, ip: String) {
         var cl: Click? = ClickBuilder().shortId(shortId).createdNow().ip(ip).build()
         cl = clickRepository.save(cl!!)
-        // TODO check why cl.getId() doesnt work
-        log.info(if (cl != null) "[" + shortId + "] saved with id [ -- no id -- ]" else "[" + shortId + "] was not saved")
+        log.info(if (cl != null) "[" + shortId + "] saved with id [ " + cl.clickId + " ]" else "[" + shortId + "] was not saved")
     }
 
     public fun getClicksFromURL(shortId: String) : List<Click>? {
