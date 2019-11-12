@@ -2,7 +2,7 @@ function eventQR(url) {
     $.ajax({
         type: "GET",
         url: "/qr",
-        data: "url='" + url + "'",
+        data: "url=" + url,
         success: function (msg) {
             $("#resultQR").html(
                 "<img src='data:image/png;base64," + msg + "'/>"
@@ -43,7 +43,7 @@ function eventStatistics(event) {
     $.ajax({
         type: "GET",
         url: "/statistics",
-        data: "short='" + $(this).serializeArray()[0].value + "'",
+        data: "short=" + $(this).serializeArray()[0].value,
         success: function (msg) {
             $("#statistics-table").className = "table-responsive";
             var table = '';
@@ -69,6 +69,6 @@ function eventStatistics(event) {
 
 $(document).ready(
     function () {
-        $("#shortener").submit(eventShortUrl)
-        $("#statistics").submit(eventStatistics)
+        $("#shortener").submit(eventShortUrl);
+        $("#statistics").submit(eventStatistics);
     });
