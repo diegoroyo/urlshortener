@@ -8,9 +8,9 @@ function eventQR(url) {
                 "<img src='data:image/png;base64," + msg + "'/>"
             );
         },
-        error: function () {
+        error: function (error) {
             $("#resultQR").html(
-                "<div class='alert alert-danger lead'>QR CODE ERROR</div>");
+                "<div class='alert alert-danger lead'>" + JSON.parse(error.responseText).message + "</div>");
         }
     });
 }
@@ -31,9 +31,9 @@ function eventShortUrl(event) {
                 + "</a></div>");
             eventQR('http://localhost:8080/' + msg.id);
         },
-        error: function () {
+        error: function (error) {
             $("#result").html(
-                "<div class='alert alert-danger lead'>ERROR</div>");
+                "<div class='alert alert-danger lead'>" + JSON.parse(error.responseText).message + "</div>");
         }
     });
 };

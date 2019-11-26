@@ -8,9 +8,12 @@ import java.io.ByteArrayOutputStream
 import java.util.Base64
 import javax.imageio.ImageIO
 import khttp.post
+import org.apache.commons.validator.routines.UrlValidator
 import org.json.JSONObject
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
+import reactor.core.publisher.Mono
+import urlshortener.domain.InvalidURL
 import urlshortener.domain.ShortURL
 import urlshortener.repository.ShortURLRepository
 
@@ -22,15 +25,19 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
 
     public fun findByKey(id: String): ShortURL? = shortURLRepository.findByKey(id)
 
-    public fun save(url: String, ip: String, vanity: String? = null): ShortURL? {
-        val su: ShortURL? = ShortURLBuilder()
+    public fun save(url: String, ip: String, vanity: String? = null): Mono<ShortURL> {
+        val urlValidator = UrlValidator(arrayOf("http", "https"))
+        if (!urlValidator.isValid(url) || !checkSafeBrowsing(url)) {
+            throw InvalidURL
+        }
+        val su = ShortURLBuilder()
                 .target(url, vanity)
                 .createdNow()
                 .temporaryRedirect()
                 .ip(ip)
                 .unknownCountry() // TODO
                 .build()
-        return shortURLRepository.save(su!!)
+        return shortURLRepository.save(su)
     }
 
     // TODO catchear esto
@@ -40,19 +47,18 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
         val byteMatrix = QRCodeWriter().encode(qrCodeText, BarcodeFormat.QR_CODE, size, size)
 
         // Make the BufferedImage that are to hold the QRCode
-        val matrixWidth = byteMatrix.getWidth()
-        var image = BufferedImage(matrixWidth, matrixWidth, BufferedImage.TYPE_INT_RGB)
+        val image = BufferedImage(size, size, BufferedImage.TYPE_INT_RGB)
         image.createGraphics()
 
         // Creation of the image
-        var graphics = image.getGraphics()
+        val graphics = image.getGraphics()
         graphics.setColor(Color.WHITE)
-        graphics.fillRect(0, 0, matrixWidth, matrixWidth)
+        graphics.fillRect(0, 0, size, size)
         graphics.setColor(Color.BLACK)
 
         // Paints the image qr with the colors with the byteMatrix
-        for (i in 0..matrixWidth - 1) {
-            for (j in 0..matrixWidth - 1) {
+        for (i in 0..size - 1) {
+            for (j in 0..size - 1) {
                 if (byteMatrix.get(i, j)) {
                     graphics.fillRect(i, j, 1, 1)
                 }

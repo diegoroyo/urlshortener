@@ -46,6 +46,10 @@ dependencies {
 
     compile "com.github.jkcclemens:khttp:0.1.0"
 
+    compile 'org.springframework.boot:spring-boot-starter-webflux:2.2.1.RELEASE'
+
+    implementation 'io.reactivex.rxjava2:rxkotlin:2.4.0'
+
     implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
     implementation 'org.springframework.boot:spring-boot-starter-hateoas'
     implementation 'org.springframework.boot:spring-boot-starter-web'

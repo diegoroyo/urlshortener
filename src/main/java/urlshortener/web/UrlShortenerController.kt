@@ -2,7 +2,6 @@ package urlshortener.web
 
 import java.net.URI
 import javax.servlet.http.HttpServletRequest
-import org.apache.commons.validator.routines.UrlValidator
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -11,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import reactor.core.publisher.Mono
 import urlshortener.domain.Click
 import urlshortener.domain.ShortURL
 import urlshortener.service.ClickService
@@ -21,23 +21,10 @@ class UrlShortenerController(private val shortUrlService: ShortURLService, priva
 
     @PostMapping("/link")
     fun shortener(
-        @RequestParam("url") url: String,
+        @RequestParam(value = "url", required = true) url: String,
         @RequestParam(value = "vanity", required = false) vanity: String?,
         request: HttpServletRequest
-    ): ResponseEntity<ShortURL> {
-        val urlValidator = UrlValidator(arrayOf("http", "https"))
-        return if (urlValidator.isValid(url) && shortUrlService.checkSafeBrowsing(url)) {
-            val su = if (vanity.isNullOrBlank()) {
-                shortUrlService.save(url, request.getRemoteAddr())
-            } else {
-                // TODO comprobar que vanity es valido
-                shortUrlService.save(url, request.getRemoteAddr(), vanity)
-            }
-            ResponseEntity.created(URI(url)).body(su)
-        } else {
-            ResponseEntity.badRequest().build()
-        }
-    }
+    ): Mono<ShortURL> = shortUrlService.save(url, request.getRemoteAddr(), vanity)
 
     @GetMapping("/{id:(?!link|index).*}")
     fun redirectTo(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<Unit> {

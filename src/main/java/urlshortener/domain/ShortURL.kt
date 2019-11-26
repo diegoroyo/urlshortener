@@ -3,6 +3,7 @@ package urlshortener.domain
 import java.net.URI
 import java.sql.Date
 import org.springframework.http.HttpStatus
+import java.lang.RuntimeException
 import org.springframework.web.bind.annotation.ResponseStatus
 
 data class ShortURL(
@@ -15,3 +16,15 @@ data class ShortURL(
     var IP: String? = null,      // ip del usuario creador
     var country: String? = null  // país del usuario creador
 )
+
+@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+object StorageError : RuntimeException("Internal storage error")
+
+@ResponseStatus(HttpStatus.NOT_FOUND)
+object NotFound : RuntimeException("URL not found")
+
+@ResponseStatus(HttpStatus.BAD_REQUEST)
+object InvalidURL : RuntimeException("Invalid URL")
+
+@ResponseStatus(HttpStatus.CONFLICT)
+object ConflictingURL : RuntimeException("Conflicting URL")
