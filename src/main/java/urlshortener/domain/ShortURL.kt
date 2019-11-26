@@ -1,7 +1,9 @@
 package urlshortener.domain
 
-import java.net.URI;
-import java.sql.Date;
+import java.net.URI
+import java.sql.Date
+import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.ResponseStatus
 
 data class ShortURL(
     var id: String? = null,      // hash o vanity
