@@ -11,10 +11,10 @@ import org.springframework.jdbc.core.RowMapper
 import org.springframework.stereotype.Repository
 import reactor.core.publisher.Mono
 import urlshortener.domain.ShortURL
-import urlshortener.domain.StorageError
-import urlshortener.domain.NotFound
-import urlshortener.domain.InvalidURL
-import urlshortener.domain.ConflictingURL
+import urlshortener.domain.ShortURLStorageError
+import urlshortener.domain.ShortURLNotFound
+import urlshortener.domain.ShortURLInvalid
+import urlshortener.domain.ShortURLConflicting
 import urlshortener.repository.ShortURLRepository
 
 @Repository
@@ -32,12 +32,17 @@ public class ShortURLRepositoryImpl(val jdbc: JdbcTemplate) : ShortURLRepository
             )
     }
 
-    override fun findByKey(id: String): ShortURL? {
+    override fun findByKey(id: String): Mono<ShortURL> {
         try {
-            return jdbc.queryForObject("SELECT * FROM shorturl WHERE id=?", rowMapper, id)
+            val su = jdbc.queryForObject("SELECT * FROM shorturl WHERE id=?", rowMapper, id)
+            if (su == null) {
+                throw ShortURLNotFound
+            } else {
+                return Mono.just(su)
+            }
         } catch (e: Exception) {
             log.debug("When select for key {}", id, e)
-            return null
+            throw ShortURLStorageError
         }
     }
 
@@ -57,10 +62,10 @@ public class ShortURLRepositoryImpl(val jdbc: JdbcTemplate) : ShortURLRepository
                     su.active, su.safe, su.IP, su.country)
         } catch (e: DuplicateKeyException) {
             log.debug("When insert for key {}", su.id, e)
-            throw ConflictingURL
+            throw ShortURLConflicting
         } catch (e: Exception) {
             log.debug("When insert", e)
-            throw StorageError
+            throw ShortURLStorageError
         }
         return Mono.just(su)
     }

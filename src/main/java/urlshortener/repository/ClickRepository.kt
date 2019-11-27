@@ -1,14 +1,14 @@
-package urlshortener.repository;
+package urlshortener.repository
 
-import urlshortener.domain.Click;
-
-import kotlin.collections.List;
+import kotlin.collections.List
+import reactor.core.publisher.Mono
+import urlshortener.domain.Click
 
 public interface ClickRepository {
 
-    public fun findByShortURL(id: String) : List<Click>?
+    public fun findByShortURL(id: String): Mono<List<Click>>
 
-    public fun save(cl: Click) : Click?
+    public fun save(cl: Click): Mono<Click>
 
     public fun update(cl: Click)
 
@@ -16,7 +16,7 @@ public interface ClickRepository {
 
     public fun deleteAll()
 
-    public fun count() : Long?
+    public fun count(): Long?
 
-    public fun list(limit: Long?, offset: Long?) : List<Click>?
+    public fun list(limit: Long?, offset: Long?): List<Click>?
 }

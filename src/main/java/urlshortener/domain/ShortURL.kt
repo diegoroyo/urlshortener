@@ -18,13 +18,13 @@ data class ShortURL(
 )
 
 @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-object StorageError : RuntimeException("Internal storage error")
+object ShortURLStorageError : RuntimeException("Internal storage error")
 
 @ResponseStatus(HttpStatus.NOT_FOUND)
-object NotFound : RuntimeException("URL not found")
+object ShortURLNotFound : RuntimeException("URL not found")
 
 @ResponseStatus(HttpStatus.BAD_REQUEST)
-object InvalidURL : RuntimeException("Invalid URL")
+object ShortURLInvalid : RuntimeException("Invalid URL")
 
 @ResponseStatus(HttpStatus.CONFLICT)
-object ConflictingURL : RuntimeException("Conflicting URL")
+object ShortURLConflicting : RuntimeException("Conflicting URL")

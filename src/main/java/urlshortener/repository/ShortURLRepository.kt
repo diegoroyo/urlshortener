@@ -6,7 +6,7 @@ import urlshortener.domain.ShortURL
 
 public interface ShortURLRepository {
 
-    public fun findByKey(id: String): ShortURL?
+    public fun findByKey(id: String): Mono<ShortURL>
 
     public fun findByTarget(target: String): List<ShortURL>
 

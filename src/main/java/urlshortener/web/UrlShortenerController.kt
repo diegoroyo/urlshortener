@@ -2,6 +2,7 @@ package urlshortener.web
 
 import java.net.URI
 import javax.servlet.http.HttpServletRequest
+import javax.validation.constraints.Pattern
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -28,41 +29,25 @@ class UrlShortenerController(private val shortUrlService: ShortURLService, priva
 
     @GetMapping("/{id:(?!link|index).*}")
     fun redirectTo(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<Unit> {
-        val l: ShortURL? = shortUrlService.findByKey(id)
-        return if (l != null) {
-            clickService.saveClick(id, request.getRemoteAddr())
-            val h = HttpHeaders()
-            h.setLocation(URI.create(l.target))
-            ResponseEntity.status(HttpStatus.valueOf(l.mode!!)).headers(h).build()
-        } else {
-            ResponseEntity.notFound().build()
-        }
+        val l: ShortURL = shortUrlService.findByKey(id).block()!!
+        clickService.saveClick(id, request.getRemoteAddr())
+        val h = HttpHeaders()
+        h.setLocation(URI.create(l.target))
+        return ResponseEntity.status(HttpStatus.valueOf(l.mode!!)).headers(h).build()
     }
 
+    // TODO sustituir pattern localhost por una constante
     @GetMapping("/qr")
     fun generateQr(
-        @RequestParam(value = "url", required = true) url: String
-    ): ResponseEntity<String> {
-        // TODO sustituir localhost
-        val start: String = "http://localhost:8080/"
-        return if (url.startsWith(start) &&
-            shortUrlService.findByKey(url.substring(start.length)) != null) {
-            val qrImage: String = shortUrlService.generateQR(url)
-            ResponseEntity.ok(qrImage)
-        } else {
-            ResponseEntity.notFound().build()
-        }
+        @RequestParam(value = "url", required = true)
+        @Pattern(regexp = "^http://localhost:8080/.*") url: String
+    ): Mono<String> {
+        shortUrlService.findByKey(url.substring("http://localhost:8080/".length))
+        return shortUrlService.generateQR(url)
     }
 
     @GetMapping("/statistics")
     fun getStatistics(
         @RequestParam(value = "short", required = true) short: String
-    ): ResponseEntity<List<Click>> {
-        val clickList = clickService.getClicksFromURL(short)
-        return if (clickList != null) {
-            ResponseEntity.ok(clickList)
-        } else {
-            ResponseEntity.notFound().build()
-        }
-    }
+    ): Mono<List<Click>> = clickService.getClicksFromURL(short)
 }

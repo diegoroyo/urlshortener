@@ -13,8 +13,8 @@ import org.json.JSONObject
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
-import urlshortener.domain.InvalidURL
 import urlshortener.domain.ShortURL
+import urlshortener.domain.ShortURLInvalid
 import urlshortener.repository.ShortURLRepository
 
 @Service
@@ -23,13 +23,14 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
     @Value("\${google.safebrowsing.api_key}")
     lateinit var safeBrowsingKey: String
 
-    public fun findByKey(id: String): ShortURL? = shortURLRepository.findByKey(id)
+    public fun findByKey(id: String): Mono<ShortURL> = shortURLRepository.findByKey(id)
 
     public fun save(url: String, ip: String, vanity: String? = null): Mono<ShortURL> {
         val urlValidator = UrlValidator(arrayOf("http", "https"))
         if (!urlValidator.isValid(url) || !checkSafeBrowsing(url)) {
-            throw InvalidURL
+            throw ShortURLInvalid
         }
+        // TODO comprobar vanity valido
         val su = ShortURLBuilder()
                 .target(url, vanity)
                 .createdNow()
@@ -41,7 +42,7 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
     }
 
     // TODO catchear esto
-    public fun generateQR(qrCodeText: String, size: Int = 400): String {
+    public fun generateQR(qrCodeText: String, size: Int = 400): Mono<String> {
 
         // Create the ByteMatrix for the QR-Code that encodes the given String
         val byteMatrix = QRCodeWriter().encode(qrCodeText, BarcodeFormat.QR_CODE, size, size)
@@ -68,17 +69,17 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
         baos.use {
             ImageIO.write(image, "png", baos)
             baos.flush()
-            return Base64.getEncoder().encodeToString(baos.toByteArray())
+            return Mono.just(Base64.getEncoder().encodeToString(baos.toByteArray()))
         }
     }
 
+    // TODO cachear esto + proceso de fondo que lea la cache
     public fun checkSafeBrowsing(url: String): Boolean {
         val mapClient = mapOf("clientId" to "es.unizar.urlshortener", "clientVersion" to "1.0.0")
         val mapThreatInfo = mapOf("threatTypes" to listOf("MALWARE", "SOCIAL_ENGINEERING"),
                                   "platformTypes" to listOf("WINDOWS"),
                                   "threatEntryTypes" to listOf("URL"),
                                   "threatEntries" to listOf(mapOf("url" to url)))
-        print(mapOf("client" to mapClient, "threatInfo" to mapThreatInfo).toString())
         var r = post("https://safebrowsing.googleapis.com/v4/threatMatches:find?key=$safeBrowsingKey",
             data = JSONObject(mapOf("client" to mapClient, "threatInfo" to mapThreatInfo)))
         return JSONObject(r.text).length() == 0

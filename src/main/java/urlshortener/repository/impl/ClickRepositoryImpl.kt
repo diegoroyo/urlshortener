@@ -1,29 +1,27 @@
-package urlshortener.repository.impl;
+package urlshortener.repository.impl
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.DirectFieldAccessor;
-import org.springframework.dao.DuplicateKeyException;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.stereotype.Repository;
-import urlshortener.domain.Click;
-import urlshortener.repository.ClickRepository;
-import java.sql.ResultSet;
-import kotlin.collections.List;
-
-import java.sql.PreparedStatement;
-import java.sql.Statement;
-import java.sql.Types;
+import java.sql.PreparedStatement
+import java.sql.ResultSet
+import java.sql.Statement
+import kotlin.collections.List
+import org.slf4j.LoggerFactory
+import org.springframework.beans.DirectFieldAccessor
+import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.jdbc.core.RowMapper
+import org.springframework.jdbc.support.GeneratedKeyHolder
+import org.springframework.jdbc.support.KeyHolder
+import org.springframework.stereotype.Repository
+import reactor.core.publisher.Mono
+import urlshortener.domain.Click
+import urlshortener.domain.ClickStorageError
+import urlshortener.repository.ClickRepository
 
 @Repository
 public class ClickRepositoryImpl(val jdbc: JdbcTemplate) : ClickRepository {
 
     private val log = LoggerFactory.getLogger(ClickRepositoryImpl::class.java)
-    
-    private val rowMapper : RowMapper<Click> = RowMapper {
+
+    private val rowMapper: RowMapper<Click> = RowMapper {
         rs: ResultSet, _ -> // rowNum: Int
             Click(
                 rs.getLong("clickId"), rs.getString("shortId"),
@@ -33,25 +31,24 @@ public class ClickRepositoryImpl(val jdbc: JdbcTemplate) : ClickRepository {
             )
     }
 
-    override fun findByShortURL(id: String) : List<Click>? {
+    override fun findByShortURL(id: String): Mono<List<Click>> {
         try {
-            return jdbc.query("SELECT * FROM click WHERE shortId=?", rowMapper, id)
-        } 
-        catch (e: Exception) {
-            log.debug("When select for shortId " + id, e);
-            return emptyList<Click>()
+            return Mono.just(jdbc.query("SELECT * FROM click WHERE shortId=?", rowMapper, id))
+        } catch (e: Exception) {
+            log.debug("When select for shortId " + id, e)
+            return Mono.just(emptyList())
         }
     }
 
-    override fun save(cl: Click) : Click? {
+    override fun save(cl: Click): Mono<Click> {
         try {
-            var holder: KeyHolder = GeneratedKeyHolder();
+            val holder: KeyHolder = GeneratedKeyHolder()
             jdbc.update(
-                { 
-                    conn -> 
+                {
+                    conn ->
                     var ps: PreparedStatement = conn.prepareStatement(
-                            "INSERT INTO CLICK (shortid, created, referrer, browser, platform, ip, country)"
-                            + "VALUES (?, ?, ?, ?, ?, ?, ?)",
+                            "INSERT INTO CLICK (shortid, created, referrer, browser, platform, ip, country)" +
+                            "VALUES (?, ?, ?, ?, ?, ?, ?)",
                             Statement.RETURN_GENERATED_KEYS)
                     ps.setString(1, cl.shortId)
                     ps.setDate(2, cl.created)
@@ -65,43 +62,33 @@ public class ClickRepositoryImpl(val jdbc: JdbcTemplate) : ClickRepository {
                 holder)
             if (holder.getKeys() != null) {
                 DirectFieldAccessor(cl).setPropertyValue("clickId", (holder.getKeys()!!.get("clickId") as Number).toLong())
-            }
-            else {
+            } else {
                 log.debug("Key from database is null")
             }
-        } 
-        catch (e: DuplicateKeyException) {
-            log.debug("When insert for click with clickId " + cl.clickId, e)
-            return cl
-        } 
-        catch (e: Exception) {
+        } catch (e: Exception) {
             log.debug("When insert a click", e)
-            println(e)
-            return null
+            throw ClickStorageError
         }
-        return cl
+        return Mono.just(cl)
     }
 
     override fun update(cl: Click) {
-        log.info("ID2: {} navegador: {} SO: {} Date: {}", cl.clickId, cl.browser, cl.platform, cl.created);
+        log.info("ID2: {} navegador: {} SO: {} Date: {}", cl.clickId, cl.browser, cl.platform, cl.created)
         try {
             jdbc.update(
                     "update click set shortId=?, created=?, referrer=?, browser=?, platform=?, ip=?, country=? where clickId=?",
                     cl.shortId, cl.created, cl.referrer,
                     cl.browser, cl.platform, cl.ip,
                     cl.country, cl.clickId)
-
-        } 
-        catch (e: Exception) {
+        } catch (e: Exception) {
             log.info("When update for clickId " + cl.clickId, e)
         }
     }
-    
+
     override fun delete(id: Long?) {
         try {
             jdbc.update("delete from click where clickId=?", id)
-        } 
-        catch (e: Exception) {
+        } catch (e: Exception) {
             log.debug("When delete for clickId " + id, e)
         }
     }
@@ -109,31 +96,26 @@ public class ClickRepositoryImpl(val jdbc: JdbcTemplate) : ClickRepository {
     override fun deleteAll() {
         try {
             jdbc.update("delete from click")
-        } 
-        catch (e: Exception) {
+        } catch (e: Exception) {
             log.debug("When delete all", e)
         }
     }
 
-    override fun count() : Long? {
+    override fun count(): Long? {
         try {
             return jdbc.queryForObject("select count(*) from click", Long::class.java) as Long
-        } 
-        catch (e: Exception) {
+        } catch (e: Exception) {
             log.debug("When counting", e)
         }
-        return -1L;
+        return -1L
     }
 
-
-    override fun list(limit: Long?, offset:Long?) : List<Click>? {
+    override fun list(limit: Long?, offset: Long?): List<Click>? {
         try {
             return jdbc.query("SELECT * FROM click LIMIT ? OFFSET ?", rowMapper, mutableListOf<Long?>(limit, offset)) as List<Click>
-        } 
-        catch (e: Exception) {
-            log.debug("When select for limit " + limit + " and offset " + offset, e);        
+        } catch (e: Exception) {
+            log.debug("When select for limit " + limit + " and offset " + offset, e)
             return emptyList<Click>()
         }
     }
-
 }
