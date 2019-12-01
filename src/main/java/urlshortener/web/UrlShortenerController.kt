@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import reactor.core.publisher.Mono
+import reactor.core.publisher.Flux
 import urlshortener.domain.Click
 import urlshortener.domain.ShortURL
 import urlshortener.service.ClickService
@@ -49,5 +50,5 @@ class UrlShortenerController(private val shortUrlService: ShortURLService, priva
     @GetMapping("/statistics")
     fun getStatistics(
         @RequestParam(value = "short", required = true) short: String
-    ): Mono<List<Click>> = clickService.getClicksFromURL(short)
+    ): Flux<Click> = clickService.getClicksFromURL(short)
 }

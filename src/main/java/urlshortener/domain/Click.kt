@@ -1,6 +1,6 @@
 package urlshortener.domain
 
-import java.lang.RuntimeException
+import org.springframework.web.server.ResponseStatusException
 import java.sql.Date
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.ResponseStatus
@@ -16,8 +16,9 @@ data class Click(
     var country: String? = null
 )
 
-@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-object ClickStorageError : RuntimeException("Internal storage error")
+// TODO handling
+
+object ClickStorageError : ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal storage error")
 
 @ResponseStatus(HttpStatus.NOT_FOUND)
 object ClickNotFound : RuntimeException("Click not found")
