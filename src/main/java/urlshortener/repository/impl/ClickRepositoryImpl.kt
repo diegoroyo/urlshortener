@@ -19,7 +19,7 @@ public class ClickRepositoryImpl(val db: Database) : ClickRepository {
     private val rowMapper: ResultSetMapper<Click> = ResultSetMapper {
         rs: ResultSet ->
             Click(
-                rs.getLong("clickId"), rs.getString("shortId"),
+                rs.getInt("clickId"), rs.getString("shortId"),
                 rs.getDate("created"), rs.getString("referrer"),
                 rs.getString("browser"), rs.getString("platform"),
                 rs.getString("ip"), rs.getString("country")
@@ -40,7 +40,7 @@ public class ClickRepositoryImpl(val db: Database) : ClickRepository {
             "VALUES (?, ?, ?, ?, ?, ?, ?)")
             .parameters(cl.shortId, cl.created, cl.referrer, cl.browser, cl.platform, cl.ip, cl.country)
             .returnGeneratedKeys()
-            .getAs(Long::class.java)
+            .getAs(Int::class.java)
         ).block()
         return Mono.just(cl)
     }
