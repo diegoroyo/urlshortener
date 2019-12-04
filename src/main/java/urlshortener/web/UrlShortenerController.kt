@@ -22,7 +22,7 @@ import urlshortener.service.ShortURLService
 @RestController
 class UrlShortenerController(private val shortUrlService: ShortURLService, private val clickService: ClickService) {
 
-    @PostMapping("/link")
+    @PostMapping("/manage/{id:(?!link|index).*}")
     fun shortener(
         @RequestParam(value = "url", required = true) url: String,
         @RequestParam(value = "vanity", required = false) vanity: String?,
