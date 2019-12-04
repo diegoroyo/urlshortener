@@ -36,7 +36,6 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
                 .createdNow()
                 .temporaryRedirect()
                 .ip(ip)
-                .unknownCountry() // TODO
                 .build()
         return shortURLRepository.save(su)
     }

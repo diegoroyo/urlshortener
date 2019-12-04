@@ -67,9 +67,5 @@ public class ShortURLBuilder {
         return this;
     }
 
-    public fun unknownCountry() : ShortURLBuilder {
-        this.country = null;
-        return this;
-    }
-    
+ 
 }

@@ -6,6 +6,7 @@ import javax.validation.constraints.Pattern
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -29,9 +30,15 @@ class UrlShortenerController(private val shortUrlService: ShortURLService, priva
     ): Mono<ShortURL> = shortUrlService.save(url, request.getRemoteAddr(), vanity)
 
     @GetMapping("/{id:(?!link|index).*}")
-    fun redirectTo(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<Unit> {
+    fun redirectTo(@PathVariable id: String, request: HttpServletRequest, 
+                   @RequestHeader(value="User-Agent") userAgent: String, 
+                   @RequestHeader(value="Referer") referrer: String): ResponseEntity<Unit> { 
         val l: ShortURL = shortUrlService.findByKey(id).block()!!
-        clickService.saveClick(id, request.getRemoteAddr())
+
+        val browser:String? = Regex(pattern = "(?i)(firefox|msie|chrome|safari)[\\/\\s]([\\d.]+)").find(input = userAgent.toString())?.value
+        val platform: String? = Regex(pattern = "Windows|Linux|Mac").find(input = userAgent.toString())?.value
+     
+        clickService.saveClick(id, request.getRemoteAddr(), referrer, browser, platform)
         val h = HttpHeaders()
         h.setLocation(URI.create(l.target))
         return ResponseEntity.status(HttpStatus.valueOf(l.mode!!)).headers(h).build()

@@ -21,8 +21,7 @@ public class ClickBuilder {
         referrer,
         browser,
         platform,
-        ip,
-        country
+        ip
     );
 
     public fun shortId(shortId: String) : ClickBuilder {
@@ -35,29 +34,23 @@ public class ClickBuilder {
         return this;
     }
 
-    public fun noReferrer() : ClickBuilder {
-        this.referrer = null;
+    public fun referrer(referer: String) : ClickBuilder {
+        this.referrer = referer;
         return this;
     }
 
-    public fun unknownBrowser() : ClickBuilder {
-        this.browser = null;
+    public fun browser(browser: String?) : ClickBuilder {
+        this.browser = browser;
         return this;
     }
 
-    public fun unknownPlatform() : ClickBuilder {
-        this.platform = null;
+    public fun platform(platform: String?) : ClickBuilder {
+        this.platform = platform;
         return this;
     }
-
 
     public fun ip(ip: String) : ClickBuilder {
         this.ip = ip;
-        return this;
-    }
-
-    public fun withoutCountry() : ClickBuilder {
-        this.country = null;
         return this;
     }
 

@@ -12,8 +12,7 @@ data class Click(
     var referrer: String? = null,
     var browser: String? = null,
     var platform: String? = null,
-    var ip: String? = null,
-    var country: String? = null
+    var ip: String? = null
 )
 
 // TODO handling

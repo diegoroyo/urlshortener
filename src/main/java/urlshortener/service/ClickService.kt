@@ -14,10 +14,13 @@ public class ClickService(private val clickRepository: ClickRepository) {
 
     private val log: Logger = LoggerFactory.getLogger(ClickService::class.java)
 
-    public fun saveClick(shortId: String, ip: String): Mono<Click> {
-        var cl: Click = ClickBuilder().shortId(shortId).createdNow().ip(ip).build()
+    public fun saveClick(shortId: String, ip: String, referrer: String, browser: String?, platform: String?): Mono<Click> {
+        var cl: Click = ClickBuilder().shortId(shortId).createdNow().referrer(referrer)
+                        .browser(browser).platform(platform).build()
         cl = clickRepository.save(cl).block()!!
-        log.info("[" + shortId + "] saved with id [ " + cl.clickId + " ]")
+        log.info("[" + shortId + "] saved with id [ " + cl.clickId + " , browser " + cl.browser 
+                     + " , platform " + cl.platform + " , referrer " + cl.referrer + "]")
+                     
         return Mono.just(cl)
     }
 
