@@ -44,6 +44,16 @@ dependencies {
     compile "org.springframework.boot:spring-boot-starter-web"
     testCompile('org.springframework.boot:spring-boot-starter-test')
 
+    // Zuul
+    // https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-netflix-zuul
+    compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-zuul', version: '2.1.2.RELEASE'
+    // https://mvnrepository.com/artifact/com.marcosbarbero.cloud/spring-cloud-zuul-ratelimit-core
+    compile group: 'com.marcosbarbero.cloud', name: 'spring-cloud-zuul-ratelimit-core', version: '2.2.4.RELEASE'
+    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-jpa
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: '2.2.1.RELEASE'
+    // https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api
+    compile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
+
     compile "com.github.jkcclemens:khttp:0.1.0"
 
     compile 'org.springframework.boot:spring-boot-starter-webflux:2.2.1.RELEASE'

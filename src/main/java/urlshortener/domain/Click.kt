@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.ResponseStatus
 
 data class Click(
-    var clickId: Long? = null,
+    var clickId: Int? = null,
     var shortId: String? = null,
     var created: Date? = null,
     var referrer: String? = null,
