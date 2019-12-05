@@ -20,7 +20,7 @@ public class ClickRepositoryImpl(val db: Database) : ClickRepository {
         rs: ResultSet ->
             Click(
                 rs.getInt("clickId"), rs.getString("shortId"),
-                rs.getDate("created"), rs.getString("referrer"),
+                rs.getDate("created"), rs.getString("referer"),
                 rs.getString("browser"), rs.getString("platform"),
                 rs.getString("ip")
             )
@@ -36,9 +36,9 @@ public class ClickRepositoryImpl(val db: Database) : ClickRepository {
 
     override fun save(cl: Click): Mono<Click> {
         cl.clickId = Mono.from(db.update(
-            "INSERT INTO CLICK (shortid, created, referrer, browser, platform, ip)" +
+            "INSERT INTO CLICK (shortid, created, referer, browser, platform, ip)" +
             "VALUES (?, ?, ?, ?, ?, ?)")
-            .parameters(cl.shortId, cl.created, cl.referrer, cl.browser, cl.platform, cl.ip)
+            .parameters(cl.shortId, cl.created, cl.referer, cl.browser, cl.platform, cl.ip)
             .returnGeneratedKeys()
             .getAs(Int::class.java)
         ).block()
@@ -47,9 +47,9 @@ public class ClickRepositoryImpl(val db: Database) : ClickRepository {
 
     override fun update(cl: Click): Mono<Void> = RxJava2Adapter.completableToMono(
         db.update(
-            "update click set shortId=?, created=?, referrer=?, browser=?, platform=?, ip=?, country=?" +
+            "update click set shortId=?, created=?, referer=?, browser=?, platform=?, ip=?, country=?" +
             "where clickId=?")
-            .parameters(cl.shortId, cl.created, cl.referrer, cl.browser, cl.platform, cl.ip, cl.clickId)
+            .parameters(cl.shortId, cl.created, cl.referer, cl.browser, cl.platform, cl.ip, cl.clickId)
             .complete()
     )
 

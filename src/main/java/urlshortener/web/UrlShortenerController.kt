@@ -6,14 +6,14 @@ import javax.validation.constraints.Pattern
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import reactor.core.publisher.Mono
 import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
 import urlshortener.domain.Click
 import urlshortener.domain.ShortURL
 import urlshortener.service.ClickService
@@ -21,6 +21,9 @@ import urlshortener.service.ShortURLService
 
 @RestController
 class UrlShortenerController(private val shortUrlService: ShortURLService, private val clickService: ClickService) {
+
+    private val REGEX_BROWSER = Regex(pattern = "(?i)(firefox|msie|chrome|safari)[\\/\\s]([\\d.]+)")
+    private val REGEX_OS = Regex(pattern = "Windows|Linux|Mac")
 
     @PostMapping("/manage/{id:(?!link|index).*}")
     fun shortener(
@@ -30,15 +33,24 @@ class UrlShortenerController(private val shortUrlService: ShortURLService, priva
     ): Mono<ShortURL> = shortUrlService.save(url, request.getRemoteAddr(), vanity)
 
     @GetMapping("/{id:(?!link|index).*}")
-    fun redirectTo(@PathVariable id: String, request: HttpServletRequest, 
-                   @RequestHeader(value="User-Agent") userAgent: String, 
-                   @RequestHeader(value="Referer") referrer: String): ResponseEntity<Unit> { 
+    fun redirectTo(
+        @PathVariable id: String,
+        request: HttpServletRequest,
+        @RequestHeader(value = "User-Agent", required = false) userAgent: String?,
+        @RequestHeader(value = "Referer", required = false) referer: String?
+    ): ResponseEntity<Unit> {
+        // Ensure that click comes from a valid URL
         val l: ShortURL = shortUrlService.findByKey(id).block()!!
-
-        val browser:String? = Regex(pattern = "(?i)(firefox|msie|chrome|safari)[\\/\\s]([\\d.]+)").find(input = userAgent.toString())?.value
-        val platform: String? = Regex(pattern = "Windows|Linux|Mac").find(input = userAgent.toString())?.value
-     
-        clickService.saveClick(id, request.getRemoteAddr(), referrer, browser, platform)
+        // Get info from HTTP headers passed and IP
+        val ip = request.getRemoteAddr()
+        var browser: String? = null
+        var platform: String? = null
+        if (userAgent != null) {
+            browser = REGEX_BROWSER.find(userAgent)?.value
+            platform = REGEX_OS.find(userAgent)?.value
+        }
+        // Save and redirect
+        clickService.saveClick(id, ip, referer, browser, platform)
         val h = HttpHeaders()
         h.setLocation(URI.create(l.target))
         return ResponseEntity.status(HttpStatus.valueOf(l.mode!!)).headers(h).build()

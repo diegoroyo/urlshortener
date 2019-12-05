@@ -51,7 +51,7 @@ function eventStatistics(event) {
                 table += "<tr>"
                     + "<th scope=\"row\">" + click.clickId + "</th>"
                     + "<td>" + click.created + "</td>"
-                    + "<td>" + click.referrer + "</td>"
+                    + "<td>" + click.referer + "</td>"
                     + "<td>" + click.browser + "</td>"
                     + "<td>" + click.platform + "</td>"
                     + "<td>" + click.ip + "</td>"

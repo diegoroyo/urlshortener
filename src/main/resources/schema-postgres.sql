@@ -24,9 +24,8 @@ CREATE TABLE CLICK
     CLICKID  BIGINT CONSTRAINT click_pk PRIMARY KEY,                      -- KEY
     SHORTID  VARCHAR(256) REFERENCES SHORTURL(ID), -- Foreign key
     CREATED  TIMESTAMP,                                                   -- Creation date
-    REFERRER VARCHAR(1024),                                               -- Traffic origin
+    REFERER VARCHAR(1024),                                               -- Traffic origin
     BROWSER  VARCHAR(50),                                                 -- Browser
     PLATFORM VARCHAR(50),                                                 -- Platform
-    IP       VARCHAR(20),                                                 -- IP
-    COUNTRY  VARCHAR(50)                                                  -- Country
+    IP       VARCHAR(20)                                                  -- IP
 );
