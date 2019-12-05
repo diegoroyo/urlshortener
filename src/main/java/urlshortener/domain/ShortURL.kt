@@ -17,9 +17,7 @@ data class ShortURL(
     var active: Boolean = false, // si está activa, se puede acceder a ella
     var safe: Boolean? = null,   // maliciosa o no
     @Size(max = 20)
-    var IP: String? = null,      // ip del usuario creador
-    @Size(max = 50)
-    var country: String? = null  // país del usuario creador
+    var IP: String? = null       // ip del usuario creador
 )
 
 @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)

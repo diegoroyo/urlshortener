@@ -1,7 +1,7 @@
 function eventQR(url) {
     $.ajax({
         type: "GET",
-        url: "/qr",
+        url: "/api/qr",
         data: "url=" + url,
         success: function (msg) {
             $("#resultQR").html(
@@ -19,7 +19,7 @@ function eventShortUrl(event) {
     event.preventDefault();
     $.ajax({
         type: "POST",
-        url: "/link",
+        url: "/api/link",
         data: $(this).serialize(),
         success: function (msg) {
             // TODO cambiar localhost:8080
@@ -42,8 +42,8 @@ function eventStatistics(event) {
     event.preventDefault();
     $.ajax({
         type: "GET",
-        url: "/statistics",
-        data: "short=" + $(this).serializeArray()[0].value,
+        url: "/api/statistics",
+        data: "short=" + $(this).serializeArray()[0].value + "&pageNumber=0&pageSize=5",
         success: function (msg) {
             $("#statistics-table").className = "table-responsive";
             var table = '';
@@ -55,7 +55,6 @@ function eventStatistics(event) {
                     + "<td>" + click.browser + "</td>"
                     + "<td>" + click.platform + "</td>"
                     + "<td>" + click.ip + "</td>"
-                    + "<td>" + click.country + "</td>"
                     + "</tr>"
             })
             $("#statistics-rows").html(table);

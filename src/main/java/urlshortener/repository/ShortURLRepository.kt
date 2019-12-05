@@ -1,6 +1,7 @@
 package urlshortener.repository
 
 import kotlin.collections.List
+import org.springframework.data.domain.Pageable
 import reactor.core.publisher.Mono
 import reactor.core.publisher.Flux
 import urlshortener.domain.ShortURL
@@ -21,5 +22,5 @@ public interface ShortURLRepository {
 
     public fun count(): Mono<Long>
 
-    public fun list(limit: Long, offset: Long): Flux<ShortURL>
+    public fun list(page: Pageable): Flux<ShortURL>
 }

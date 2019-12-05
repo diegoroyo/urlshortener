@@ -1,12 +1,13 @@
 package urlshortener.repository
 
+import org.springframework.data.domain.Pageable
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import urlshortener.domain.Click
 
 public interface ClickRepository {
 
-    public fun findByShortURL(id: String): Flux<Click>
+    public fun findByShortURL(id: String, page: Pageable): Flux<Click>
 
     public fun save(cl: Click): Mono<Click>
 
@@ -16,5 +17,5 @@ public interface ClickRepository {
 
     public fun count(): Mono<Long>
 
-    public fun list(limit: Long, offset: Long): Flux<Click>
+    public fun list(page: Pageable): Flux<Click>
 }

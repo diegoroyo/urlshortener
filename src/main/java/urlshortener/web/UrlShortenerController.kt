@@ -25,14 +25,14 @@ class UrlShortenerController(private val shortUrlService: ShortURLService, priva
     private val REGEX_BROWSER = Regex(pattern = "(?i)(firefox|msie|chrome|safari)[\\/\\s]([\\d.]+)")
     private val REGEX_OS = Regex(pattern = "Windows|Linux|Mac")
 
-    @PostMapping("/manage/{id:(?!link|index).*}")
+    @PostMapping("/api/link")
     fun shortener(
         @RequestParam(value = "url", required = true) url: String,
         @RequestParam(value = "vanity", required = false) vanity: String?,
         request: HttpServletRequest
     ): Mono<ShortURL> = shortUrlService.save(url, request.getRemoteAddr(), vanity)
 
-    @GetMapping("/{id:(?!link|index).*}")
+    @GetMapping("/{id:(?!api|index).*}")
     fun redirectTo(
         @PathVariable id: String,
         request: HttpServletRequest,
@@ -57,7 +57,7 @@ class UrlShortenerController(private val shortUrlService: ShortURLService, priva
     }
 
     // TODO sustituir pattern localhost por una constante
-    @GetMapping("/qr")
+    @GetMapping("/api/qr")
     fun generateQr(
         @RequestParam(value = "url", required = true)
         @Pattern(regexp = "^http://localhost:8080/.*") url: String
@@ -66,8 +66,12 @@ class UrlShortenerController(private val shortUrlService: ShortURLService, priva
         return shortUrlService.generateQR(url)
     }
 
-    @GetMapping("/statistics")
+    @GetMapping("/api/statistics")
     fun getStatistics(
-        @RequestParam(value = "short", required = true) short: String
-    ): Flux<Click> = clickService.getClicksFromURL(short)
+        @RequestParam(value = "short", required = true) short: String,
+        @RequestParam(value = "pageNumber", required = true) pageNumber: Int,
+        @RequestParam(value = "pageSize", required = true) pageSize: Int,
+        @RequestParam(value = "sort", required = false) sort: String?,
+        @RequestParam(value = "ascending", required = false) ascending: Boolean?
+    ): Flux<Click> = clickService.getClicksFromURL(short, pageNumber, pageSize, sort, ascending)
 }

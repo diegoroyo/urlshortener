@@ -11,7 +11,6 @@ public class ClickBuilder {
     private var browser: String? = null
     private var platform: String? = null
     private var ip: String? = null
-    private var country: String? = null
 
     public fun build() = Click(
         null,

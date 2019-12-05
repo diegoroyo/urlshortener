@@ -3,6 +3,7 @@ package urlshortener.repository.impl
 import java.sql.ResultSet
 import org.davidmoten.rx.jdbc.Database
 import org.davidmoten.rx.jdbc.ResultSetMapper
+import org.springframework.data.domain.Pageable
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Repository
 import reactor.adapter.rxjava.RxJava2Adapter
@@ -28,9 +29,9 @@ public class ClickRepositoryImpl(val db: Database) : ClickRepository {
 
     // TODO error mapping
 
-    override fun findByShortURL(id: String): Flux<Click> = Flux.from(
-            db.select("SELECT * FROM click WHERE shortId=?")
-                .parameters(id)
+    override fun findByShortURL(id: String, page: Pageable): Flux<Click> = Flux.from(
+            db.select("SELECT * FROM click WHERE shortId=? ORDER BY ? LIMIT ? OFFSET ?")
+                .parameters(id, page.sort.toString().replace(":",""), page.pageSize, page.pageNumber)
                 .get(rowMapper)
         )
 
@@ -47,7 +48,7 @@ public class ClickRepositoryImpl(val db: Database) : ClickRepository {
 
     override fun update(cl: Click): Mono<Void> = RxJava2Adapter.completableToMono(
         db.update(
-            "update click set shortId=?, created=?, referer=?, browser=?, platform=?, ip=?, country=?" +
+            "update click set shortId=?, created=?, referer=?, browser=?, platform=?, ip=?" +
             "where clickId=?")
             .parameters(cl.shortId, cl.created, cl.referer, cl.browser, cl.platform, cl.ip, cl.clickId)
             .complete()
@@ -61,7 +62,7 @@ public class ClickRepositoryImpl(val db: Database) : ClickRepository {
             "select count(*) from click"
         ).getAs(Long::class.java))
 
-    override fun list(limit: Long, offset: Long): Flux<Click> = Flux.from(db.select(
-            "SELECT * FROM click LIMIT ? OFFSET ?"
-        ).parameters(limit, offset).get(rowMapper))
+    override fun list(page: Pageable): Flux<Click> = Flux.from(db.select(
+            "SELECT * FROM click ORDER BY ? LIMIT ? OFFSET ?"
+    ).parameters(page.sort.toString().replace(":",""), page.pageSize, page.pageNumber).get(rowMapper))
 }

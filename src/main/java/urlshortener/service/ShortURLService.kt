@@ -27,8 +27,13 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
 
     public fun save(url: String, ip: String, vanity: String? = null): Mono<ShortURL> {
         val urlValidator = UrlValidator(arrayOf("http", "https"))
-        if (!urlValidator.isValid(url) || !checkSafeBrowsing(url)) {
+        if (!urlValidator.isValid(url)) {
             throw ShortURLInvalid
+        } else {
+            val safe = checkSafeBrowsing(url).block()!!
+            if (!safe) {
+                throw ShortURLInvalid
+            }
         }
         // TODO comprobar vanity valido
         val su = ShortURLBuilder()
@@ -73,14 +78,15 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
     }
 
     // TODO cachear esto + proceso de fondo que lea la cache
-    public fun checkSafeBrowsing(url: String): Boolean {
+    public fun checkSafeBrowsing(url: String): Mono<Boolean> {
         val mapClient = mapOf("clientId" to "es.unizar.urlshortener", "clientVersion" to "1.0.0")
         val mapThreatInfo = mapOf("threatTypes" to listOf("MALWARE", "SOCIAL_ENGINEERING"),
                                   "platformTypes" to listOf("WINDOWS"),
                                   "threatEntryTypes" to listOf("URL"),
                                   "threatEntries" to listOf(mapOf("url" to url)))
+        // khttp 0.1.0 doesn't allow async petitions, and there are no upgrades available
         var r = post("https://safebrowsing.googleapis.com/v4/threatMatches:find?key=$safeBrowsingKey",
             data = JSONObject(mapOf("client" to mapClient, "threatInfo" to mapThreatInfo)))
-        return JSONObject(r.text).length() == 0
+        return Mono.just(JSONObject(r.text).length() == 0)
     }
 }
