@@ -32,7 +32,7 @@ class UrlShortenerController(private val shortUrlService: ShortURLService, priva
         request: HttpServletRequest
     ): Mono<ShortURL> = shortUrlService.save(url, request.getRemoteAddr(), vanity)
 
-    @GetMapping("/{id:(?!api|index).*}")
+    @GetMapping("/{id:(?!index).*}")
     fun redirectTo(
         @PathVariable id: String,
         request: HttpServletRequest,

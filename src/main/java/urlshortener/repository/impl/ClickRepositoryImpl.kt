@@ -29,11 +29,15 @@ public class ClickRepositoryImpl(val db: Database) : ClickRepository {
 
     // TODO error mapping
 
-    override fun findByShortURL(id: String, page: Pageable): Flux<Click> = Flux.from(
+    override fun findByShortURL(id: String, page: Pageable): Flux<Click> {
+        val sort = page.sort.toString().replace(":","").split(' ')
+        return Flux.from(
             db.select("SELECT * FROM click WHERE shortId=? ORDER BY ? LIMIT ? OFFSET ?")
-                .parameters(id, page.sort.toString().replace(":",""), page.pageSize, page.pageNumber)
+                .parameters(id, sort,
+                            page.pageSize, page.pageNumber * page.pageSize)
                 .get(rowMapper)
         )
+    }
 
     override fun save(cl: Click): Mono<Click> {
         cl.clickId = Mono.from(db.update(
@@ -61,8 +65,4 @@ public class ClickRepositoryImpl(val db: Database) : ClickRepository {
     override fun count(): Mono<Long> = Mono.from(db.select(
             "select count(*) from click"
         ).getAs(Long::class.java))
-
-    override fun list(page: Pageable): Flux<Click> = Flux.from(db.select(
-            "SELECT * FROM click ORDER BY ? LIMIT ? OFFSET ?"
-    ).parameters(page.sort.toString().replace(":",""), page.pageSize, page.pageNumber).get(rowMapper))
 }

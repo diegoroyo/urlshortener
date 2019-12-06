@@ -29,13 +29,18 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
         val urlValidator = UrlValidator(arrayOf("http", "https"))
         if (!urlValidator.isValid(url)) {
             throw ShortURLInvalid
-        } else {
-            val safe = checkSafeBrowsing(url).block()!!
-            if (!safe) {
+        }
+        val safe = checkSafeBrowsing(url).block()!!
+        if (!safe) {
+            throw ShortURLInvalid
+        }
+        if (!vanity.isNullOrBlank()) {
+            // Vanity validation
+            // TODO url templates
+            if (vanity == "api") {
                 throw ShortURLInvalid
             }
         }
-        // TODO comprobar vanity valido
         val su = ShortURLBuilder()
                 .target(url, vanity)
                 .createdNow()

@@ -21,6 +21,4 @@ public interface ShortURLRepository {
     public fun delete(id: String): Mono<Void>
 
     public fun count(): Mono<Long>
-
-    public fun list(page: Pageable): Flux<ShortURL>
 }

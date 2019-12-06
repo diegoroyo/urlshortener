@@ -49,6 +49,7 @@ public class ClickService(private val clickRepository: ClickRepository) {
                 page = PageRequest.of(pageNumber, pageSize, Sort.by(sortAttr).descending())
             }
         }
+        print(page.sort.toString().replace(":", ""))
         return clickRepository.findByShortURL(shortId, page)
     }
 }

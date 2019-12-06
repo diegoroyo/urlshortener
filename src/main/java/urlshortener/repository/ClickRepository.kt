@@ -16,6 +16,4 @@ public interface ClickRepository {
     public fun delete(id: Long): Mono<Void>
 
     public fun count(): Mono<Long>
-
-    public fun list(page: Pageable): Flux<Click>
 }

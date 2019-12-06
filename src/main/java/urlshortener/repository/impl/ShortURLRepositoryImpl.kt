@@ -67,8 +67,4 @@ public class ShortURLRepositoryImpl(val db: Database) : ShortURLRepository {
 
     override fun count(): Mono<Long> =
         Mono.from(db.select("select count(*) from shorturl").getAs(Long::class.java))
-
-    override fun list(page: Pageable): Flux<ShortURL> = Flux.from(db.select(
-        "SELECT * FROM shorturl ORDER BY ? LIMIT ? OFFSET ?"
-    ).parameters(page.sort.toString().replace(":",""), page.pageSize, page.pageNumber).get(rowMapper))
 }
