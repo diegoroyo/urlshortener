@@ -1,7 +1,6 @@
 package urlshortener.repository.impl
 
 import java.sql.ResultSet
-import kotlin.collections.*
 import org.davidmoten.rx.jdbc.Database
 import org.davidmoten.rx.jdbc.ResultSetMapper
 import org.slf4j.LoggerFactory
@@ -14,8 +13,9 @@ import urlshortener.domain.ShortURL
 import urlshortener.repository.ShortURLRepository
 
 @Repository
-public class ShortURLRepositoryImpl(val db: Database) : ShortURLRepository {
+class ShortURLRepositoryImpl(val db: Database) : ShortURLRepository {
 
+    // TODO: never used?
     private val log = LoggerFactory.getLogger(ClickRepositoryImpl::class.java)
 
     private val rowMapper: ResultSetMapper<ShortURL> = ResultSetMapper {
@@ -67,4 +67,9 @@ public class ShortURLRepositoryImpl(val db: Database) : ShortURLRepository {
 
     override fun count(): Mono<Long> =
         Mono.from(db.select("select count(*) from shorturl").getAs(Long::class.java))
+        
+    override fun listTemplates(): Flux<ShortURL> = Flux.from(
+        db.select("SELECT * FROM shorturl WHERE id LIKE '%{0}%'")
+        .get(rowMapper)
+    )
 }

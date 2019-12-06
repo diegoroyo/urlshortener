@@ -23,13 +23,22 @@ function eventShortUrl(event) {
         data: $(this).serialize(),
         success: function (msg) {
             // TODO cambiar localhost:8080
-            $("#result").html(
-                "<div class='alert alert-success lead'><a target='_blank' href='"
-                + 'http://localhost:8080/' + msg.id
-                + "'>"
-                + 'http://localhost:8080/' + msg.id
-                + "</a></div>");
-            eventQR('http://localhost:8080/' + msg.id);
+            if (msg.id.includes("{0}")) {
+                // No link, no qr
+                $("#result").html(
+                    "<div class='alert alert-success lead'>"
+                    + 'http://localhost:8080/' + msg.id
+                    +  "</div>");
+            } else {
+                // Link and QR
+                $("#result").html(
+                    "<div class='alert alert-success lead'><a target='_blank' href='"
+                    + 'http://localhost:8080/' + msg.id
+                    + "'>"
+                    + 'http://localhost:8080/' + msg.id
+                    + "</a></div>");
+                eventQR('http://localhost:8080/' + msg.id);
+            }
         },
         error: function (error) {
             $("#result").html(

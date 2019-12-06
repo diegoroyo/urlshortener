@@ -1,24 +1,25 @@
 package urlshortener.repository
 
-import kotlin.collections.List
 import org.springframework.data.domain.Pageable
 import reactor.core.publisher.Mono
 import reactor.core.publisher.Flux
 import urlshortener.domain.ShortURL
 
-public interface ShortURLRepository {
+interface ShortURLRepository {
 
-    public fun findByKey(id: String): Mono<ShortURL>
+    fun findByKey(id: String): Mono<ShortURL>
 
-    public fun findByTarget(target: String): Flux<ShortURL>
+    fun findByTarget(target: String): Flux<ShortURL>
 
-    public fun save(su: ShortURL): Mono<ShortURL>
+    fun save(su: ShortURL): Mono<ShortURL>
 
-    public fun mark(su: ShortURL, safeness: Boolean): Mono<ShortURL>
+    fun mark(su: ShortURL, safeness: Boolean): Mono<ShortURL>
 
-    public fun update(su: ShortURL): Mono<Void>
+    fun update(su: ShortURL): Mono<Void>
 
-    public fun delete(id: String): Mono<Void>
+    fun delete(id: String): Mono<Void>
 
-    public fun count(): Mono<Long>
+    fun count(): Mono<Long>
+
+    fun listTemplates(): Flux<ShortURL>
 }

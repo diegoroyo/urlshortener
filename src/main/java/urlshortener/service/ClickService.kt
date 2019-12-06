@@ -12,11 +12,11 @@ import urlshortener.domain.Click
 import urlshortener.repository.ClickRepository
 
 @Service
-public class ClickService(private val clickRepository: ClickRepository) {
+class ClickService(private val clickRepository: ClickRepository) {
 
     private val log: Logger = LoggerFactory.getLogger(ClickService::class.java)
 
-    public fun saveClick(
+    fun saveClick(
         shortId: String,
         ip: String,
         referer: String?,
@@ -32,21 +32,21 @@ public class ClickService(private val clickRepository: ClickRepository) {
         return Mono.just(cl)
     }
 
-    public fun getClicksFromURL(
+    fun getClicksFromURL(
         shortId: String,
         pageNumber: Int,
         pageSize: Int,
         sortAttr: String?,
         ascending: Boolean?
     ): Flux<Click> {
-        var page: Pageable?
-        if (sortAttr == null || ascending == null) {
-            page = PageRequest.of(pageNumber, pageSize, Sort.by("clickId").ascending())
+        // TODO: check if it works correctly
+        val page: Pageable = if (sortAttr == null || ascending == null) {
+            PageRequest.of(pageNumber, pageSize, Sort.by("clickId").ascending())
         } else {
             if (ascending) {
-                page = PageRequest.of(pageNumber, pageSize, Sort.by(sortAttr).ascending())
+                PageRequest.of(pageNumber, pageSize, Sort.by(sortAttr).ascending())
             } else {
-                page = PageRequest.of(pageNumber, pageSize, Sort.by(sortAttr).descending())
+                PageRequest.of(pageNumber, pageSize, Sort.by(sortAttr).descending())
             }
         }
         print(page.sort.toString().replace(":", ""))

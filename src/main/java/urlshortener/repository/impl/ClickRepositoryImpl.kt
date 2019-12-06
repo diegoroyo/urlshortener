@@ -13,8 +13,9 @@ import urlshortener.domain.Click
 import urlshortener.repository.ClickRepository
 
 @Repository
-public class ClickRepositoryImpl(val db: Database) : ClickRepository {
+class ClickRepositoryImpl(val db: Database) : ClickRepository {
 
+    // TODO: never used?
     private val log = LoggerFactory.getLogger(ClickRepositoryImpl::class.java)
 
     private val rowMapper: ResultSetMapper<Click> = ResultSetMapper {

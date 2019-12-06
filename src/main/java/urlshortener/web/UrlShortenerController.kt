@@ -18,19 +18,22 @@ import urlshortener.domain.Click
 import urlshortener.domain.ShortURL
 import urlshortener.service.ClickService
 import urlshortener.service.ShortURLService
+import org.springframework.web.util.UriTemplate
 
 @RestController
 class UrlShortenerController(private val shortUrlService: ShortURLService, private val clickService: ClickService) {
 
-    private val REGEX_BROWSER = Regex(pattern = "(?i)(firefox|msie|chrome|safari)[\\/\\s]([\\d.]+)")
-    private val REGEX_OS = Regex(pattern = "Windows|Linux|Mac")
+    private val REGEX_BROWSER = Regex("(?i)(firefox|msie|chrome|safari)[\\/\\s]([\\d.]+)")
+    private val REGEX_OS = Regex("Windows|Linux|Mac")
 
-    @PostMapping("/api/link")
+    @PostMapping("/manage/link")
     fun shortener(
         @RequestParam(value = "url", required = true) url: String,
         @RequestParam(value = "vanity", required = false) vanity: String?,
         request: HttpServletRequest
-    ): Mono<ShortURL> = shortUrlService.save(url, request.getRemoteAddr(), vanity)
+    ): Mono<ShortURL> {
+        return shortUrlService.save(url, request.remoteAddr, vanity)
+    }
 
     @GetMapping("/{id:(?!index).*}")
     fun redirectTo(
@@ -39,10 +42,27 @@ class UrlShortenerController(private val shortUrlService: ShortURLService, priva
         @RequestHeader(value = "User-Agent", required = false) userAgent: String?,
         @RequestHeader(value = "Referer", required = false) referer: String?
     ): ResponseEntity<Unit> {
-        // Ensure that click comes from a valid URL
-        val l: ShortURL = shortUrlService.findByKey(id).block()!!
+        var l: ShortURL? = shortUrlService.findTemplate(id).take(1).blockFirst()
+        // Treat id/target differently depending on whether the short url is a template or not
+        var reconstructedId: String?
+        var target: String?
+        if (l == null) {
+            // No template
+            l = shortUrlService.findByKey(id).block()!!
+            target = l.target
+            reconstructedId = l.id
+        } else {
+            // Change template and create original id to save on click table
+            val map = UriTemplate(l.id!!).match(id)
+            target = l.target
+            reconstructedId = l.id
+            for ((key, value) in map) {
+                target = target!!.replace("{" + key + "}", value)
+                reconstructedId = reconstructedId!!.replace(value, "{" + key + "}")
+            }
+        }
         // Get info from HTTP headers passed and IP
-        val ip = request.getRemoteAddr()
+        val ip = request.remoteAddr
         var browser: String? = null
         var platform: String? = null
         if (userAgent != null) {
@@ -50,14 +70,14 @@ class UrlShortenerController(private val shortUrlService: ShortURLService, priva
             platform = REGEX_OS.find(userAgent)?.value
         }
         // Save and redirect
-        clickService.saveClick(id, ip, referer, browser, platform)
+        clickService.saveClick(reconstructedId!!, ip, referer, browser, platform)
         val h = HttpHeaders()
-        h.setLocation(URI.create(l.target))
+        h.location = URI.create(target!!)
         return ResponseEntity.status(HttpStatus.valueOf(l.mode!!)).headers(h).build()
     }
 
     // TODO sustituir pattern localhost por una constante
-    @GetMapping("/api/qr")
+    @GetMapping("/manage/qr")
     fun generateQr(
         @RequestParam(value = "url", required = true)
         @Pattern(regexp = "^http://localhost:8080/.*") url: String

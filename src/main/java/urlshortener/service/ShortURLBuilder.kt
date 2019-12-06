@@ -6,7 +6,7 @@ import java.sql.Date
 import org.springframework.http.HttpStatus
 import urlshortener.domain.ShortURL
 
-public class ShortURLBuilder {
+class ShortURLBuilder {
 
     private var id: String? = null
     private var target: String? = null
@@ -16,7 +16,7 @@ public class ShortURLBuilder {
     private var safe: Boolean? = null
     private var ip: String? = null
 
-    public fun build() = ShortURL(
+    fun build() = ShortURL(
         id,
         target,
         created,
@@ -26,7 +26,7 @@ public class ShortURLBuilder {
         ip
     )
 
-    public fun target(url: String, vanity: String? = null): ShortURLBuilder {
+    fun target(url: String, vanity: String? = null): ShortURLBuilder {
         this.target = url
         if (vanity.isNullOrBlank()) {
             this.id = Hashing.murmur3_32().hashString(url, StandardCharsets.UTF_8).toString()
@@ -36,27 +36,27 @@ public class ShortURLBuilder {
         return this
     }
 
-    public fun createdNow(): ShortURLBuilder {
+    fun createdNow(): ShortURLBuilder {
         this.created = Date(System.currentTimeMillis())
         return this
     }
 
-    public fun temporaryRedirect(): ShortURLBuilder {
+    fun temporaryRedirect(): ShortURLBuilder {
         this.mode = HttpStatus.TEMPORARY_REDIRECT.value()
         return this
     }
 
-    public fun makeActive(): ShortURLBuilder {
+    fun makeActive(): ShortURLBuilder {
         this.active = true
         return this
     }
 
-    public fun treatAsSafe(): ShortURLBuilder {
+    fun treatAsSafe(): ShortURLBuilder {
         this.safe = true
         return this
     }
 
-    public fun ip(ip: String): ShortURLBuilder {
+    fun ip(ip: String): ShortURLBuilder {
         this.ip = ip
         return this
     }
