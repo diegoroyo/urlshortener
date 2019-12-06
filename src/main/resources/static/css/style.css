@@ -1,0 +1,53 @@
+body{
+	background:url(../images/bosques.jpg);
+}
+
+.description-web-page{
+	background:black;
+}
+
+h1, p {
+   font-weight:bold;
+   animation-duration: 400ms;
+   animation-name: blink;
+   animation-iteration-count: infinite;
+   animation-direction: alternate;
+}
+@keyframes blink {
+   from {
+      color:yellow;
+   }
+   to {
+      color:blue;
+   }
+ }
+
+.letters{ 
+	text-align: center; 
+	margin: 0 auto 0 auto; 
+} 
+	
+.letter{ 
+	display: inline-block;
+}
+
+
+th, td{
+	padding: 20px;
+}
+
+tr, td{
+	background-color: #f4de9e;
+}
+
+thead {
+	background-color: #246355;
+}
+
+tr:nth-child(even){
+	background-color: #ddd;
+}
+
+tr:hover td {
+	background-color: #369681;
+}
