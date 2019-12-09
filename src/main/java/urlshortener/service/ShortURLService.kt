@@ -133,6 +133,7 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
         } catch (e: InterruptedException) {
             throw IllegalStateException(e)
         }
+
     }
 
     public fun validateVanity(su: ShortURL): ShortURL {
