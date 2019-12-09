@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.Cacheable
+import org.springframework.core.env.Environment
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.springframework.web.util.UriTemplate
@@ -37,6 +38,9 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
     // Necessary for self-invocation of cache function
     @Autowired
     private val shortURLService: ShortURLService? = null
+
+    @Autowired
+    private val env: Environment? = null
 
     public fun findByKey(id: String): Mono<ShortURL> = shortURLRepository.findByKey(id)
 
@@ -180,7 +184,7 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
 
     @Scheduled(fixedRate=10000)
     fun reviewSafeURLs() {
-        val jedis = Jedis("localhost", 6379);
+        val jedis = Jedis(env?.getProperty("spring.redis.host"), 6379);
         for (cachedString in jedis.keys("safeURLs::*")) {
             val parts = cachedString.split(":", limit=3)
             val cachedUrl = parts[2]
