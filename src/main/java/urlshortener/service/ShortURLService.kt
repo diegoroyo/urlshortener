@@ -2,23 +2,26 @@ package urlshortener.service
 
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.qrcode.QRCodeWriter
-import java.awt.Color
-import java.awt.image.BufferedImage
-import java.io.ByteArrayOutputStream
-import java.util.Base64
-import javax.imageio.ImageIO
 import khttp.post
 import org.apache.commons.validator.routines.UrlValidator
 import org.json.JSONObject
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
-import reactor.core.publisher.Mono
+import org.springframework.web.util.UriTemplate
 import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
 import urlshortener.domain.ShortURL
-import urlshortener.exception.NotFoundError
 import urlshortener.exception.BadRequestError
 import urlshortener.repository.ShortURLRepository
-import org.springframework.web.util.UriTemplate
+import java.awt.Color
+import java.awt.image.BufferedImage
+import java.io.ByteArrayOutputStream
+import java.time.LocalDateTime
+import java.util.*
+import javax.imageio.ImageIO
+
 
 @Service
 public class ShortURLService(private val shortURLRepository: ShortURLRepository) {
@@ -27,6 +30,10 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
 
     @Value("\${google.safebrowsing.api_key}")
     var safeBrowsingKey: String? = null
+
+    // Necessary for self-invocation of cache function
+    @Autowired
+    private val shortURLService: ShortURLService? = null
 
     public fun findByKey(id: String): Mono<ShortURL> = shortURLRepository.findByKey(id)
 
@@ -55,9 +62,8 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
         return shortURLRepository.save(su).then(checkSafeBrowsing(su))
     }
 
-    // TODO catchear esto
+    @Cacheable("qrs", key = "#qrCodeText")
     public fun generateQR(qrCodeText: String, size: Int = 400): Mono<String> {
-
         // Create the ByteMatrix for the QR-Code that encodes the given String
         val byteMatrix = QRCodeWriter().encode(qrCodeText, BarcodeFormat.QR_CODE, size, size)
 
@@ -87,20 +93,41 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
         }
     }
 
-    // TODO cachear esto + proceso de fondo que lea la cache
     public fun checkSafeBrowsing(su: ShortURL): Mono<ShortURL> {
+        println()
+        print(LocalDateTime.now())
+        println(" - checking if url is safe...")
+        val res = shortURLService?.safeBrowsing(su)
+        println()
+        print(LocalDateTime.now())
+        println(" - finished checking url!\n")
+        return Mono.just(res)
+    }
+
+    @Cacheable("safeURLs", key="#su.target", unless="!#result.safe")
+    fun safeBrowsing(su: ShortURL) : ShortURL {
         val mapClient = mapOf("clientId" to "es.unizar.urlshortener", "clientVersion" to "1.0.0")
         val mapThreatInfo = mapOf("threatTypes" to listOf("MALWARE", "SOCIAL_ENGINEERING"),
-                                  "platformTypes" to listOf("WINDOWS"),
-                                  "threatEntryTypes" to listOf("URL"),
-                                  "threatEntries" to listOf(mapOf("url" to su.target!!)))
+                "platformTypes" to listOf("WINDOWS"),
+                "threatEntryTypes" to listOf("URL"),
+                "threatEntries" to listOf(mapOf("url" to su.target!!)))
         // khttp 0.1.0 doesn't allow async petitions, and there are no upgrades available
         val r = post("https://safebrowsing.googleapis.com/v4/threatMatches:find?key=$safeBrowsingKey",
-            data = JSONObject(mapOf("client" to mapClient, "threatInfo" to mapThreatInfo)))
+                data = JSONObject(mapOf("client" to mapClient, "threatInfo" to mapThreatInfo)))
         if (JSONObject(r.text).length() == 0) {
             shortURLRepository.mark(su, true)
         }
-        return Mono.just(su)
+        simulateSlowService()
+        return su
+    }
+
+    private fun simulateSlowService() {
+        try {
+            val time = 3000L
+            Thread.sleep(time)
+        } catch (e: InterruptedException) {
+            throw IllegalStateException(e)
+        }
     }
 
     public fun validateVanity(su: ShortURL): ShortURL {
