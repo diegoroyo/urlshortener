@@ -2,8 +2,9 @@ package urlshortener.domain
 
 import java.sql.Date
 import javax.validation.constraints.Size
+import java.io.Serializable
 
-data class ShortURL(
+data class ShortURL (
     @Size(max = 256)
     var id: String? = null,      // hash o vanity
     @Size(max = 1024)
@@ -14,4 +15,4 @@ data class ShortURL(
     var safe: Boolean? = null,   // maliciosa o no
     @Size(max = 20)
     var IP: String? = null       // ip del usuario creador
-)
+) : Serializable

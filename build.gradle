@@ -54,6 +54,12 @@ dependencies {
     // https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api
     compile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
 
+    // Redis
+    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-redis
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-redis', version: '2.2.2.RELEASE'
+    // https://mvnrepository.com/artifact/redis.clients/jedis
+    compile group: 'redis.clients', name: 'jedis', version: '2.8.0'
+
     compile "com.github.jkcclemens:khttp:0.1.0"
 
     compile 'org.springframework.boot:spring-boot-starter-webflux:2.2.1.RELEASE'
