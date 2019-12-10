@@ -16,6 +16,8 @@ function eventQR(url) {
 }
 
 function eventShortUrl(event) {
+    $("#result").html('');
+    $("#resultQR").html('');
     event.preventDefault();
     $.ajax({
         type: "POST",
@@ -49,6 +51,8 @@ function eventShortUrl(event) {
 };
 
 function eventStatistics(event) {
+    $('#statistics-head').add('hidden');
+    $("#statistics-rows").html('');
     event.preventDefault();
     $.ajax({
         type: "GET",
@@ -56,7 +60,6 @@ function eventStatistics(event) {
         data: "short=" + $(this).serializeArray()[0].value + "&pageNumber=0&pageSize=5",
         success: function (msg) {
             $('#statistics-head').removeAttr('hidden');
-            $("#statistics-table").className = "table-responsive";
             var table = '';
             msg.forEach(function (click) {
                 table += "<tr>"
@@ -71,7 +74,6 @@ function eventStatistics(event) {
             $("#statistics-rows").html(table);
         },
         error: function (e) {
-            print('Exception has ocurred: ' + e)
             $("#resultQR").html(
                 "<div class='alert alert-danger lead'>STATISTICS ERROR</div>");
         }

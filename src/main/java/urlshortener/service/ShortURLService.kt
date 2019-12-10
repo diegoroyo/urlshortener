@@ -184,6 +184,7 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
         return su
     }
 
+    // TODO mapeo de excepciones
     public fun findTemplate(string: String): Flux<ShortURL> =
     shortURLRepository.listTemplates().filter {
             candidate: ShortURL ->
