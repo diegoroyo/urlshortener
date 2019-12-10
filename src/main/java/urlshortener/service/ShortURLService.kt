@@ -119,7 +119,7 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
         return Mono.just(res)
     }
 
-    @Cacheable("safeURLs", key="#su.target", unless="!#result.safe")
+    @Cacheable("safeURLs", key="#su.id", unless="!#result.safe")
     fun safeBrowsing(su: ShortURL) : ShortURL {
         simulateSlowService()
         su.safe = su.target?.let { isSafe(it) }
@@ -195,19 +195,29 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
         val jedis = Jedis(env?.getProperty("spring.redis.host"), 6379);
         for (cachedString in jedis.keys("safeURLs::*")) {
             val parts = cachedString.split(":", limit=3)
-            val cachedUrl = parts[2]
-            println("Checking if the url $cachedUrl is safe")
-            if (!isSafe(cachedUrl)) {
-                shortURLService?.removeUrl(cachedUrl)
-                println("The url $cachedUrl is not safe")
+            val cachedId = parts[2]
+            val url = shortURLService?.obtainUrl(cachedId)
+            if (url != null) {
+                println("Checking if the url ${url.target} is safe")
+                if (!url.target?.let { isSafe(it) }!!) {
+                    url.target?.let { shortURLService?.removeUrl(it) }
+                    println("The url $url.target is not safe")
+                }
             }
         }
     }
 
-    @CacheEvict("safeURLs", key="#url")
-    fun removeUrl(url: String) {
+    @Cacheable("safeURLs", key="#id")
+    fun obtainUrl(id: String): ShortURL {
         // TODO: create an error if URL does not exist in cache
-        println("Error, the url $url is not saved in the cache")
+        println("Error, the url $id is not saved in the cache")
+        return ShortURL()
+    }
+
+    @CacheEvict("safeURLs", key="#id")
+    fun removeUrl(id: String) {
+        // TODO: create an error if URL does not exist in cache
+        println("Error, the url $id is not saved in the cache")
     }
 
 }
