@@ -104,7 +104,7 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
         println()
         print(LocalDateTime.now())
         println(" - checking if url is safe...")
-        val res = shortURLService?.safeBrowsing(su)
+        val res = shortURLService!!.safeBrowsing(su)
         println()
         print(LocalDateTime.now())
         println(" - finished checking url!\n")
@@ -123,10 +123,10 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
         val mapThreatInfo = mapOf("threatTypes" to listOf("MALWARE", "SOCIAL_ENGINEERING"),
                 "platformTypes" to listOf("WINDOWS"),
                 "threatEntryTypes" to listOf("URL"),
-                "threatEntries" to listOf(mapOf("url" to url!!)))
+                "threatEntries" to listOf(mapOf("url" to url)))
         // khttp 0.1.0 doesn't allow async petitions, and there are no upgrades available
         val r = post("https://safebrowsing.googleapis.com/v4/threatMatches:find?key=$safeBrowsingKey",
-                data = JSONObject(mapOf("client" to mapClient, "threatInfo" to mapThreatInfo)))
+                data = JSONObject(mapOf("client" to mapClient, "threatInfo" to mapThreatInfo)), timeout=1.0)
         return JSONObject(r.text).length() == 0
     }
 
