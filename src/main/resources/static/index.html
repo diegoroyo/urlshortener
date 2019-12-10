@@ -14,7 +14,7 @@
 </head>
 <body>
 <center>
-<div class="letters">
+<div class="letters" style="margin-top:80px; margin-bottom:-35px">
 	<img class="letter" src="images/r.gif" height="100">
 	<img class="letter" src="images/i.gif" height="100">
 	<img class="letter" src="images/o.gif" height="100">
@@ -25,93 +25,90 @@
 	<img class="letter" src="images/a.gif" height="100">
 </div>
 <div class="container-full">
-    <div class="row">
-        <div class="col-lg-12 text-center">
+    <div class="row justify-content-center">
+        <div class="col">
 			<img class="foto2" src="images/tijIzq.gif"  align="left" style="margin:20px">
 			<img class="foto2" src="images/tijDer.gif" align="right" style="margin:20px">
 			<div class="description-web-page">
 			<br>
-				<h1>URL Shortener</h1>
-				<p class="lead">A front-end example page for the project</p>
+				<h1>Río volga shortening services</h1>
+				<p class="lead">URLs can be long like a river. We shorten them.</p>
 			<br>
 			</div>
-			<center>
-                <form action="" class="col-lg-12" id="shortener" role="form">
-                    <div class="input-group input-group-lg col-sm-offset-4 col-sm-4">
-                        <div class="form-group">
-							<br>
-							<div class="col text-center">
-								 <input class="center-block form-control input-lg" name="url"
-										placeholder="Enter a URL" title="Enter a URL" type="text" style="width:450px">
-							</div>
+			<div class="row justify-content-center">
+				<form action="" class="col-6" id="shortener" role="form">
+					<div class="row form-group">
+						<br>
+						<div class="col">
+								<input class="center-block form-control input-lg" name="url"
+									placeholder="Enter a URL" title="Enter a URL" type="text" style="width:450px">
 						</div>
-						<div class="form-group">
-							<br>
-                            <div class="col text-center">
-                                <input class="center-block form-control input-lg" name="vanity"
-										placeholder="Vanity" title="Vanity" type="text" style="width:450px">
-                            </div>
-                        </div>
+					</div>
+					<div class="row form-group">
 						<br>
-                        <div class="col text-center">
+						<div class="col">
+							<input class="center-block form-control input-lg" name="vanity"
+									placeholder="Vanity" title="Vanity" type="text" style="width:450px">
+						</div>
+					</div>
+					<br>
+					<div class="row">
 						<br>
-                        <span class="input-group-btn"><button
-                                class="btn btn-lg btn-primary" type="submit">Short me!</button></span>
-                        </div>
-                    </div>
-                </form>
-			</center>
+						<div class="col">
+							<span class="input-group-btn"><button
+									class="btn btn-lg btn-primary" type="submit">Short me!</button></span>
+						</div>
+					</div>
+				</form>
+			</div>
         </div>
     </div>
-	<form action="" class="col-lg-12" id="qrRes" role="form">
-		<div class="row">
-			<div class="col-lg-12 text-center">
-				<div class="col-sm-offset-4 col-sm-4 text-center">
-					<br/>
-					<div id="result"></div>
-				</div>
-				<div class="col-sm-offset-4 col-sm-4 text-center">
-					<br/>
-					<div id="resultQR"></div>
-				</div>
+	<div class="row justify-content-center">
+		<div class="col-4">
+			<br/>
+			<div id="result"></div>
+		</div>
+	</div>
+	<div class="row justify-content-center">
+		<div class="col-4">
+			<br/>
+			<div id="resultQR"></div>
+		</div>
+	</div>
+	<form action="" id="statistics" role="form">
+		<div class="row justify-content-center">
+			<div class="col-6">
+				<br>
+				<input class="center-block form-control" name="short"
+					placeholder="Enter short URL" title="Enter short URL" type="text">
 			</div>
 		</div>
-	</form>
-    <div class="row">
-        <form action="" class="col-lg-12" id="statistics" role="form">
-            <div class="input-group input-group-lg col-sm-offset-4 col-sm-4">
-			
-                <div class="form-group">
-                    <div class="col text-center">
+		<div class="row justify-content-center">
+				<div class="col">
 					<br>
-                        <input class="center-block form-control input-lg" name="short"
-                            placeholder="Enter short URL" title="Enter short URL" type="text" style="width:450px">
-                    </div>
-                </div>
-                <div class="col text-center">
-				<br>
-                <span class="input-group-btn"><button
-                        class="btn btn-lg btn-primary" type="submit">Show statistics</button></span>
-				<br>
-                </div>
-            </div>
-			<div class="statistics_table">
-				<br>
-				<table class="table table-responsive">
-					<thead>
-					<tr>
-						<th scope="col">Click ID</th>
-						<th scope="col">Created</th>
-						<th scope="col">Referer</th>
-						<th scope="col">Browser</th>
-						<th scope="col">Platform</th>
-						<th scope="col">IP</th>
-					</tr>
-					</thead>
-					<tbody id="statistics-rows"></tbody>
-				</table>
-			</div>
-		</form>
+					<span class="input-group-btn"><button
+							class="btn btn-lg btn-primary" type="submit">Show statistics</button></span>
+					<br>
+				</div>
+		</div>
+	</form>
+	<div class="row justify-content-center">
+		<div class="col-6 statistics_table">
+			<br>
+			<table id="statistics-head" class="table w-100" hidden>
+				<thead>
+				<tr>
+					<th>Click ID</th>
+					<th>Created</th>
+					<th>Referer</th>
+					<th>Browser</th>
+					<th>Platform</th>
+					<th>IP</th>
+				</tr>
+				</thead>
+				<tbody id="statistics-rows"></tbody>
+			</table>
+		</div>
     </div>
 </div>
 </center>

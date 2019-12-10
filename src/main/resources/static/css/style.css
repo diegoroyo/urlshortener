@@ -1,14 +1,10 @@
 body{
-	background:url(../images/bosques.jpg);
-}
-
-.description-web-page{
-	background:black;
+	background:url(../images/background.jpg);
 }
 
 h1, p {
    font-weight:bold;
-   animation-duration: 400ms;
+   animation-duration: 700ms;
    animation-name: blink;
    animation-iteration-count: infinite;
    animation-direction: alternate;
@@ -18,7 +14,7 @@ h1, p {
       color:yellow;
    }
    to {
-      color:blue;
+      color:white;
    }
  }
 
@@ -37,17 +33,17 @@ th, td{
 }
 
 tr, td{
-	background-color: #f4de9e;
+	background-color: #eeeeee;
 }
 
 thead {
-	background-color: #246355;
+	background-color: #cccccc;
 }
 
 tr:nth-child(even){
-	background-color: #ddd;
+	background-color: #dddddd;
 }
 
 tr:hover td {
-	background-color: #369681;
+	background-color: #ffffff;
 }

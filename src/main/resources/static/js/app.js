@@ -23,21 +23,22 @@ function eventShortUrl(event) {
         data: $(this).serialize(),
         success: function (msg) {
             // TODO cambiar localhost:8080
-            if (msg.id.includes("{0}")) {
+            var json = JSON.parse(msg)
+            if (json['id'].includes("{0}")) {
                 // No link, no qr
                 $("#result").html(
                     "<div class='alert alert-success lead'>"
-                    + 'http://localhost:8080/' + msg.id
+                    + 'http://localhost:8080/' + json['id']
                     +  "</div>");
             } else {
                 // Link and QR
                 $("#result").html(
                     "<div class='alert alert-success lead'><a target='_blank' href='"
-                    + 'http://localhost:8080/' + msg.id
+                    + 'http://localhost:8080/' + json['id']
                     + "'>"
-                    + 'http://localhost:8080/' + msg.id
+                    + 'http://localhost:8080/' + json['id']
                     + "</a></div>");
-                eventQR('http://localhost:8080/' + msg.id);
+                eventQR('http://localhost:8080/' + json['id']);
             }
         },
         error: function (error) {
@@ -54,6 +55,7 @@ function eventStatistics(event) {
         url: "/api/statistics",
         data: "short=" + $(this).serializeArray()[0].value + "&pageNumber=0&pageSize=5",
         success: function (msg) {
+            $('#statistics-head').removeAttr('hidden');
             $("#statistics-table").className = "table-responsive";
             var table = '';
             msg.forEach(function (click) {
@@ -68,7 +70,8 @@ function eventStatistics(event) {
             })
             $("#statistics-rows").html(table);
         },
-        error: function () {
+        error: function (e) {
+            print('Exception has ocurred: ' + e)
             $("#resultQR").html(
                 "<div class='alert alert-danger lead'>STATISTICS ERROR</div>");
         }
