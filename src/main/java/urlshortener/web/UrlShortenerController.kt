@@ -35,7 +35,7 @@ class UrlShortenerController(private val shortUrlService: ShortURLService, priva
         return shortUrlService.save(url, request.remoteAddr, vanity)
     }
 
-    @GetMapping("/{id:(?!index).*}")
+    @GetMapping("/{id:(?!swagger-ui|index).*}")
     fun redirectTo(
         @PathVariable id: String,
         request: HttpServletRequest,

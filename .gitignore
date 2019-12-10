@@ -5,6 +5,8 @@ build/
 .settings/
 bin/
 .classpath
+gradle
+gradlew
 # Ignore Gradle GUI config
 gradle-app.setting
 
