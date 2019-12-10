@@ -69,8 +69,16 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
         return shortURLRepository.save(su).then(checkSafeBrowsing(su))
     }
 
+    fun generateQR(qrCodeText: String, size: Int = 400): Mono<String>? {
+        if (shortURLService != null) {
+            return Mono.just(shortURLService.generateQRString(qrCodeText, size))
+        } else {
+            return null
+        }
+    }
+
     @Cacheable("qrs", key = "#qrCodeText")
-    public fun generateQR(qrCodeText: String, size: Int = 400): Mono<String> {
+    fun generateQRString(qrCodeText: String, size: Int = 400): String {
         // Create the ByteMatrix for the QR-Code that encodes the given String
         val byteMatrix = QRCodeWriter().encode(qrCodeText, BarcodeFormat.QR_CODE, size, size)
 
@@ -96,7 +104,7 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
         baos.use {
             ImageIO.write(image, "png", baos)
             baos.flush()
-            return Mono.just(Base64.getEncoder().encodeToString(baos.toByteArray()))
+            return Base64.getEncoder().encodeToString(baos.toByteArray())
         }
     }
 
