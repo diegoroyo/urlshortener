@@ -16,6 +16,7 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import urlshortener.domain.Click
 import urlshortener.domain.ShortURL
+import urlshortener.exception.NotFoundError
 import urlshortener.service.ClickService
 import urlshortener.service.ShortURLService
 import org.springframework.web.util.UriTemplate
@@ -35,45 +36,36 @@ class UrlShortenerController(private val shortUrlService: ShortURLService, priva
         return shortUrlService.save(url, request.remoteAddr, vanity)
     }
 
-    @GetMapping("/{id:(?!swagger-ui|index).*}")
+    @GetMapping(value = ["/{id:(?!swagger-ui|index)\\w+}", "/{id:(?!swagger-ui|index)\\w+}/{vanity:\\w+}"])
     fun redirectTo(
         @PathVariable id: String,
+        @PathVariable vanity: String?,
         request: HttpServletRequest,
         @RequestHeader(value = "User-Agent", required = false) userAgent: String?,
         @RequestHeader(value = "Referer", required = false) referer: String?
     ): ResponseEntity<Unit> {
-        var l: ShortURL? = shortUrlService.findTemplate(id).take(1).blockFirst()
-        // Treat id/target differently depending on whether the short url is a template or not
-        var reconstructedId: String?
-        var target: String?
-        if (l == null) {
-            // No template
-            l = shortUrlService.findByKey(id).block()!!
-            target = l.target
-            reconstructedId = l.id
-        } else {
-            // Change template and create original id to save on click table
-            val map = UriTemplate(l.id!!).match(id)
-            target = l.target
-            reconstructedId = l.id
-            for ((key, value) in map) {
-                target = target!!.replace("{" + key + "}", value)
-                reconstructedId = reconstructedId!!.replace(value, "{" + key + "}")
-            }
+        var su: ShortURL? = null
+        vanity?.let {
+            su = shortUrlService.findByKey(id + "/{0}").block()!!
+            su?.target = su?.target!!.replace("{0}", vanity)
+        } ?: run {
+            su = shortUrlService.findByKey(id).block()!!
         }
         // Get info from HTTP headers passed and IP
         val ip = request.remoteAddr
         var browser: String? = null
         var platform: String? = null
-        if (userAgent != null) {
+        userAgent?.let {
             browser = REGEX_BROWSER.find(userAgent)?.value
             platform = REGEX_OS.find(userAgent)?.value
         }
         // Save and redirect
-        clickService.saveClick(reconstructedId!!, ip, referer, browser, platform)
-        val h = HttpHeaders()
-        h.location = URI.create(target!!)
-        return ResponseEntity.status(HttpStatus.valueOf(l.mode!!)).headers(h).build()
+        clickService.saveClick(su?.id!!, ip, referer, browser, platform)
+        val h = with(HttpHeaders()) {
+            location = URI.create(su?.target!!)
+            this
+        }
+        return ResponseEntity.status(HttpStatus.valueOf(su?.mode!!)).headers(h).build()
     }
 
     // TODO sustituir pattern localhost por una constante

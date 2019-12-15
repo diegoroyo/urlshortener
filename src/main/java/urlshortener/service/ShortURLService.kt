@@ -31,6 +31,8 @@ import javax.imageio.ImageIO
 public class ShortURLService(private val shortURLRepository: ShortURLRepository) {
 
     private val REGEX_BRACKET = Regex("\\{[a-z]+\\}", setOf(RegexOption.IGNORE_CASE))
+    private val REGEX_VANITY = Regex("[a-z]+\\/(\\{[a-z]+\\})", setOf(RegexOption.IGNORE_CASE))
+    private val BANNED_VANITY = listOf("api", "swagger-ui")
 
     @Value("\${google.safebrowsing.api_key}")
     var safeBrowsingKey: String? = null
@@ -48,11 +50,11 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
         // Valid URL
         val urlValidator = UrlValidator(arrayOf("http", "https"))
         if (!urlValidator.isValid(url)) {
-            throw BadRequestError("Invalid URL to short")
+            return Mono.error(BadRequestError("Invalid URL to short"))
         }
         // Valid vanity
-        if (!vanity.isNullOrBlank() && vanity == "api") {
-            throw BadRequestError("Vanity cannot start with \"api/\"")
+        if (!vanity.isNullOrBlank() && vanity in BANNED_VANITY) {
+            return Mono.error(BadRequestError("Vanity cannot start with " + vanity))
         }
         var su = ShortURLBuilder()
                 .target(url, vanity)
@@ -62,11 +64,11 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
                 .build()
         // Treat vanity for URL templates
         if (!vanity.isNullOrBlank()) {
-            validateVanity(su)
+            su = validateVanity(su).block()!!
         }
         // Save and start checking safe browsing
-        // TODO probablemente se puede hacer de otra manera uniendo monos
-        return shortURLRepository.save(su).then(checkSafeBrowsing(su))
+        checkSafeBrowsing(su)
+        return shortURLRepository.save(su)
     }
 
     fun generateQR(qrCodeText: String, size: Int = 400): Mono<String>? {
@@ -148,50 +150,28 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
 
     }
 
-    public fun validateVanity(su: ShortURL): ShortURL {
+    public fun validateVanity(su: ShortURL): Mono<ShortURL> {
         val matchVanity = REGEX_BRACKET.find(su.id!!)?.groups
         val matchUrl = REGEX_BRACKET.find(su.target!!)?.groups
         if (matchVanity != null && matchUrl != null) {
             // Same length
-            if (matchUrl.count() != matchVanity.count()) {
-                throw BadRequestError("URL and vanity don't have same number of groups")
+            if (matchUrl.count() != 1 || matchUrl.count() != 1) {
+                return Mono.error(BadRequestError("URL and vanity should only have one group"))
             }
             // Not repeated
-            var strings = mutableListOf<String>()
-            for (i in 0..matchVanity.count() - 1) {
-                val string = matchVanity.get(i)!!.value
-                if (strings.contains(string)) {
-                    throw BadRequestError("Group $string appears more than once")
-                }
-                strings.add(matchVanity.get(i)!!.value)
+            val stringVanity = matchVanity.get(0)!!.value
+            val stringUrl = matchVanity.get(0)!!.value
+            if (stringVanity != stringUrl) {
+                return Mono.error(BadRequestError("Vanity groups don't match"))
             }
             // Matches are one to one (also modify target & hash)
-            for (i in 0..matchVanity.count() - 1) {
-                var found = false
-                for (j in 0..matchUrl.count() - 1) {
-                    if (matchUrl.get(j)!!.value == strings[i]) {
-                        su.target = su.target!!.replace(strings.get(i), "{$i}")
-                        su.id = su.id!!.replace(strings.get(i), "{$i}")
-                        found = true
-                        break
-                    }
-                }
-                if (!found) {
-                    throw BadRequestError("Group ${strings.get(i)} doesn't have a match")
-                }
-            }
+            su.target = su.target!!.replace(stringUrl, "{0}")
+            su.id = su.id!!.replace(stringVanity, "{0}")
         }
-        return su
+        return Mono.just(su)
     }
 
-    // TODO mapeo de excepciones
-    public fun findTemplate(string: String): Flux<ShortURL> =
-    shortURLRepository.listTemplates().filter {
-            candidate: ShortURL ->
-                UriTemplate(candidate.id!!).matches(string)
-    }
-
-    @Scheduled(fixedRate=10000)
+    @Scheduled(fixedRate=600000) // 600 segundos
     fun reviewSafeURLs() {
         val jedis = Jedis(env?.getProperty("spring.redis.host"), 6379);
         for (cachedString in jedis.keys("safeURLs::*")) {
