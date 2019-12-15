@@ -18,13 +18,13 @@ class ClickService(private val clickRepository: ClickRepository) {
 
     fun saveClick(
         shortId: String,
-        ip: String,
+        clickIp: String,
         referer: String?,
         browser: String?,
         platform: String?
     ): Mono<Click> {
         var cl: Click = ClickBuilder().shortId(shortId).createdNow().referer(referer)
-                        .browser(browser).platform(platform).build()
+                        .browser(browser).platform(platform).ip(clickIp).build()
         cl = clickRepository.save(cl).block()!!
         log.info("[" + shortId + "] saved with id [ " + cl.clickId + " , browser " + cl.browser +
                      " , platform " + cl.platform + " , referer " + cl.referer + "]")

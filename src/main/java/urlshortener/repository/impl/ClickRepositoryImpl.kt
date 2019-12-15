@@ -9,13 +9,13 @@ import org.springframework.stereotype.Repository
 import reactor.adapter.rxjava.RxJava2Adapter
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import urlshortener.exception.InternalServerError
 import urlshortener.domain.Click
 import urlshortener.repository.ClickRepository
 
 @Repository
 class ClickRepositoryImpl(val db: Database) : ClickRepository {
 
-    // TODO: never used?
     private val log = LoggerFactory.getLogger(ClickRepositoryImpl::class.java)
 
     private val rowMapper: ResultSetMapper<Click> = ResultSetMapper {
@@ -27,8 +27,6 @@ class ClickRepositoryImpl(val db: Database) : ClickRepository {
                 rs.getString("ip")
             )
     }
-
-    // TODO error mapping
 
     override fun findByShortURL(id: String, page: Pageable): Flux<Click> {
         val sort = page.sort.toString().replace(":","").split(' ')

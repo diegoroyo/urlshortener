@@ -1,3 +1,8 @@
+function url(s) {
+    var l = window.location;
+    return l.protocol + "//" + l.hostname + (((l.port != 80) && (l.port != 443)) ? ":" + l.port : "") + l.pathname + s;
+}
+
 function eventQR(url) {
     $.ajax({
         type: "GET",
@@ -24,23 +29,22 @@ function eventShortUrl(event) {
         url: "/api/link",
         data: $(this).serialize(),
         success: function (msg) {
-            // TODO cambiar localhost:8080
             var json = JSON.parse(msg)
             if (json['id'].includes("{0}")) {
                 // No link, no qr
                 $("#result").html(
                     "<div class='alert alert-success lead'>"
-                    + 'http://localhost:8080/' + json['id']
+                    + url(json['id'])
                     +  "</div>");
             } else {
                 // Link and QR
                 $("#result").html(
                     "<div class='alert alert-success lead'><a target='_blank' href='"
-                    + 'http://localhost:8080/' + json['id']
+                    + url(json['id'])
                     + "'>"
-                    + 'http://localhost:8080/' + json['id']
+                    + url(json['id'])
                     + "</a></div>");
-                eventQR('http://localhost:8080/' + json['id']);
+                eventQR(url(json['id']));
             }
         },
         error: function (error) {

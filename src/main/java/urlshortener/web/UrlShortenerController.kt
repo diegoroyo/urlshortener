@@ -6,6 +6,7 @@ import javax.validation.constraints.Pattern
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -26,6 +27,11 @@ class UrlShortenerController(private val shortUrlService: ShortURLService, priva
 
     private val REGEX_BROWSER = Regex("(?i)(firefox|msie|chrome|safari)[\\/\\s]([\\d.]+)")
     private val REGEX_OS = Regex("Windows|Linux|Mac")
+
+    @Value("\${spring.server.host}")
+    lateinit var serverIp: String
+    @Value("\${spring.server.port}")
+    lateinit var serverPort: String
 
     @PostMapping("/manage/link")
     fun shortener(
@@ -68,13 +74,12 @@ class UrlShortenerController(private val shortUrlService: ShortURLService, priva
         return ResponseEntity.status(HttpStatus.valueOf(su?.mode!!)).headers(h).build()
     }
 
-    // TODO sustituir pattern localhost por una constante
     @GetMapping("/manage/qr")
     fun generateQr(
         @RequestParam(value = "url", required = true)
-        @Pattern(regexp = "^http://localhost:8080/.*") url: String
+        @Pattern(regexp = "^http://\$serverIp:\$serverPort/.*") url: String
     ): Mono<String>? {
-        shortUrlService.findByKey(url.substring("http://localhost:8080/".length))
+        shortUrlService.findByKey(url.substring("http://\$serverIp:\$serverPort/".length))
         return shortUrlService.generateQR(url)
     }
 

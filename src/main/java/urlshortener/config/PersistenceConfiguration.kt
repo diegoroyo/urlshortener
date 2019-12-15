@@ -20,7 +20,6 @@ public class PersistenceConfiguration {
     
     @Bean
     fun dbInitialization(): Database {
-        // TODO maxPoolNumber
         return Database.from(DB_CONNECTION, 100)
     }
 

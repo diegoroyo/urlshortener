@@ -2,6 +2,12 @@ package urlshortener.service
 
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.qrcode.QRCodeWriter
+import java.awt.Color
+import java.awt.image.BufferedImage
+import java.io.ByteArrayOutputStream
+import java.time.LocalDateTime
+import java.util.*
+import javax.imageio.ImageIO
 import khttp.post
 import org.apache.commons.validator.routines.UrlValidator
 import org.json.JSONObject
@@ -12,20 +18,12 @@ import org.springframework.cache.annotation.Cacheable
 import org.springframework.core.env.Environment
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
-import org.springframework.web.util.UriTemplate
-import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import reactor.core.scheduler.Schedulers
 import redis.clients.jedis.Jedis
 import urlshortener.domain.ShortURL
 import urlshortener.exception.BadRequestError
 import urlshortener.repository.ShortURLRepository
-import java.awt.Color
-import java.awt.image.BufferedImage
-import java.io.ByteArrayOutputStream
-import java.time.LocalDateTime
-import java.util.*
-import javax.imageio.ImageIO
-
 
 @Service
 public class ShortURLService(private val shortURLRepository: ShortURLRepository) {
@@ -110,25 +108,17 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
         }
     }
 
-    public fun checkSafeBrowsing(su: ShortURL): Mono<ShortURL> {
-        println()
-        print(LocalDateTime.now())
-        println(" - checking if url is safe...")
-        val res = shortURLService!!.safeBrowsing(su)
-        println()
-        print(LocalDateTime.now())
-        println(" - finished checking url!\n")
-        return Mono.just(res)
-    }
+    public fun checkSafeBrowsing(su: ShortURL): Mono<ShortURL> =
+        Mono.fromSupplier{ shortURLService!!.safeBrowsing(su) }.subscribeOn(Schedulers.elastic())
 
-    @Cacheable("safeURLs", key="#su.id", unless="!#result.safe")
-    fun safeBrowsing(su: ShortURL) : ShortURL {
+    @Cacheable("safeURLs", key = "#su.id", unless = "!#result.safe")
+    fun safeBrowsing(su: ShortURL): ShortURL {
         simulateSlowService()
         su.safe = su.target?.let { isSafe(it) }
         return su
     }
 
-    fun isSafe(url: String) : Boolean {
+    fun isSafe(url: String): Boolean {
         val mapClient = mapOf("clientId" to "es.unizar.urlshortener", "clientVersion" to "1.0.0")
         val mapThreatInfo = mapOf("threatTypes" to listOf("MALWARE", "SOCIAL_ENGINEERING"),
                 "platformTypes" to listOf("WINDOWS"),
@@ -136,18 +126,19 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
                 "threatEntries" to listOf(mapOf("url" to url)))
         // khttp 0.1.0 doesn't allow async petitions, and there are no upgrades available
         val r = post("https://safebrowsing.googleapis.com/v4/threatMatches:find?key=$safeBrowsingKey",
-                data = JSONObject(mapOf("client" to mapClient, "threatInfo" to mapThreatInfo)), timeout=1.0)
+                data = JSONObject(mapOf("client" to mapClient, "threatInfo" to mapThreatInfo)), timeout = 1.0)
         return JSONObject(r.text).length() == 0
     }
 
     private fun simulateSlowService() {
         try {
-            val time = 3000L
+            // URL should not be accessible in the first 20 seconds
+            // afters 20s execute safe check
+            val time = 20000L
             Thread.sleep(time)
         } catch (e: InterruptedException) {
             throw IllegalStateException(e)
         }
-
     }
 
     public fun validateVanity(su: ShortURL): Mono<ShortURL> {
@@ -171,11 +162,11 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
         return Mono.just(su)
     }
 
-    @Scheduled(fixedRate=600000) // 600 segundos
+    @Scheduled(fixedRate = 600000) // 600 segundos
     fun reviewSafeURLs() {
-        val jedis = Jedis(env?.getProperty("spring.redis.host"), 6379);
+        val jedis = Jedis(env?.getProperty("spring.redis.host"), 6379)
         for (cachedString in jedis.keys("safeURLs::*")) {
-            val parts = cachedString.split(":", limit=3)
+            val parts = cachedString.split(":", limit = 3)
             val cachedId = parts[2]
             val url = shortURLService?.obtainUrl(cachedId)
             if (url != null) {
@@ -188,17 +179,16 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
         }
     }
 
-    @Cacheable("safeURLs", key="#id")
+    @Cacheable("safeURLs", key = "#id")
     fun obtainUrl(id: String): ShortURL {
         // TODO: create an error if URL does not exist in cache
         println("Error, the url $id is not saved in the cache")
         return ShortURL()
     }
 
-    @CacheEvict("safeURLs", key="#id")
+    @CacheEvict("safeURLs", key = "#id")
     fun removeUrl(id: String) {
         // TODO: create an error if URL does not exist in cache
         println("Error, the url $id is not saved in the cache")
     }
-
 }

@@ -15,7 +15,6 @@ import urlshortener.repository.ShortURLRepository
 @Repository
 class ShortURLRepositoryImpl(val db: Database) : ShortURLRepository {
 
-    // TODO: never used?
     private val log = LoggerFactory.getLogger(ClickRepositoryImpl::class.java)
 
     private val rowMapper: ResultSetMapper<ShortURL> = ResultSetMapper {

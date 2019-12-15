@@ -47,7 +47,7 @@ class ClickBuilder {
         return this
     }
 
-    fun ip(ip: String): ClickBuilder {
+    fun ip(ip: String?): ClickBuilder {
         this.ip = ip
         return this
     }
