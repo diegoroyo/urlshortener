@@ -9,6 +9,7 @@ import java.util.*
 import javax.imageio.ImageIO
 import khttp.post
 import org.apache.commons.validator.routines.UrlValidator
+import com.google.zxing.client.j2se.MatrixToImageWriter
 import org.json.JSONObject
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -74,28 +75,9 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
     fun generateQRString(qrCodeText: String, size: Int = 400): String {
         // Create the ByteMatrix for the QR-Code that encodes the given String
         val byteMatrix = QRCodeWriter().encode(qrCodeText, BarcodeFormat.QR_CODE, size, size)
-
-        // Make the BufferedImage that are to hold the QRCode
-        val image = BufferedImage(size, size, BufferedImage.TYPE_INT_RGB)
-        image.createGraphics()
-
-        // Creation of the image
-        val graphics = image.graphics
-        graphics.color = Color.WHITE
-        graphics.fillRect(0, 0, size, size)
-        graphics.color = Color.BLACK
-
-        // Paints the image qr with the colors with the byteMatrix
-        for (i in 0 until size) {
-            for (j in 0 until size) {
-                if (byteMatrix.get(i, j)) {
-                    graphics.fillRect(i, j, 1, 1)
-                }
-            }
-        }
         val baos = ByteArrayOutputStream()
         baos.use {
-            ImageIO.write(image, "png", baos)
+            MatrixToImageWriter.writeToStream(byteMatrix, "png", baos)
             baos.flush()
             return Base64.getEncoder().encodeToString(baos.toByteArray())
         }
@@ -163,7 +145,8 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
 
     @Scheduled(fixedRate = 600000) // 600 segundos
     fun reviewSafeURLs() {
-        val jedis = Jedis(env?.getProperty("spring.redis.host"), 6379)
+        val port = env?.getProperty("spring.redis.port");
+        var jedis = Jedis(env?.getProperty("spring.redis.host"), port!!.toInt());
         for (cachedString in jedis.keys("safeURLs::*")) {
             val parts = cachedString.split(":", limit = 3)
             val cachedId = parts[2]
