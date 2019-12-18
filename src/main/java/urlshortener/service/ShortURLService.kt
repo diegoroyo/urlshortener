@@ -114,8 +114,8 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
     private fun simulateSlowService() {
         try {
             // URL should not be accessible in the first 20 seconds
-            // afters 20s execute safe check
-            val time = 4000L
+            // afters 10s execute safe check
+            val time = 10000L
             Thread.sleep(time)
         } catch (e: InterruptedException) {
             throw IllegalStateException(e)
