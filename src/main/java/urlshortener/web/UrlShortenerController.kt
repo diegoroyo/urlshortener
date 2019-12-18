@@ -3,10 +3,10 @@ package urlshortener.web
 import java.net.URI
 import javax.servlet.http.HttpServletRequest
 import javax.validation.constraints.Pattern
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -17,10 +17,8 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import urlshortener.domain.Click
 import urlshortener.domain.ShortURL
-import urlshortener.exception.NotFoundError
 import urlshortener.service.ClickService
 import urlshortener.service.ShortURLService
-import org.springframework.web.util.UriTemplate
 
 @RestController
 class UrlShortenerController(private val shortUrlService: ShortURLService, private val clickService: ClickService) {
@@ -57,6 +55,9 @@ class UrlShortenerController(private val shortUrlService: ShortURLService, priva
         } ?: run {
             su = shortUrlService.findByKey(id).block()!!
         }
+        if (!su?.active!! || !su?.safe!!) {
+            return ResponseEntity.notFound().build()
+        }
         // Get info from HTTP headers passed and IP
         val ip = request.remoteAddr
         var browser: String? = null
@@ -87,8 +88,6 @@ class UrlShortenerController(private val shortUrlService: ShortURLService, priva
     fun getStatistics(
         @RequestParam(value = "short", required = true) short: String,
         @RequestParam(value = "pageNumber", required = true) pageNumber: Int,
-        @RequestParam(value = "pageSize", required = true) pageSize: Int,
-        @RequestParam(value = "sort", required = false) sort: String?,
-        @RequestParam(value = "ascending", required = false) ascending: Boolean?
-    ): Flux<Click> = clickService.getClicksFromURL(short, pageNumber, pageSize, sort, ascending)
+        @RequestParam(value = "pageSize", required = true) pageSize: Int
+    ): Flux<Click> = clickService.getClicksFromURL(short, pageNumber, pageSize)
 }

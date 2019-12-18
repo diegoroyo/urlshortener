@@ -54,6 +54,9 @@ function eventShortUrl(event) {
     });
 };
 
+pageNum = -1
+pageSize = 5
+
 function eventStatistics(event) {
     $('#statistics-head').add('hidden');
     $("#statistics-rows").html('');
@@ -61,7 +64,7 @@ function eventStatistics(event) {
     $.ajax({
         type: "GET",
         url: "/api/statistics",
-        data: "short=" + $(this).serializeArray()[0].value + "&pageNumber=0&pageSize=5",
+        data: "short=" + $(this).serializeArray()[0].value + "&pageNumber=" + pageNum + "&pageSize=" + pageSize,
         success: function (msg) {
             $('#statistics-head').removeAttr('hidden');
             var table = '';
@@ -76,6 +79,8 @@ function eventStatistics(event) {
                     + "</tr>"
             })
             $("#statistics-rows").html(table);
+            $('#statistics-back').removeAttr('hidden');
+            $("#statistics-button").html('Next page');
         },
         error: function (e) {
             $("#resultQR").html(
@@ -88,4 +93,10 @@ $(document).ready(
     function () {
         $("#shortener").submit(eventShortUrl);
         $("#statistics").submit(eventStatistics);
+        $("#statistics-back").click(() => {
+            pageNum = pageNum - 1
+        });
+        $("#statistics-button").click(() => {
+            pageNum = pageNum + 1
+        });
     });

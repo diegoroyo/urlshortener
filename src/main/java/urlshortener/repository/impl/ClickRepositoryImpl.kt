@@ -3,13 +3,12 @@ package urlshortener.repository.impl
 import java.sql.ResultSet
 import org.davidmoten.rx.jdbc.Database
 import org.davidmoten.rx.jdbc.ResultSetMapper
-import org.springframework.data.domain.Pageable
 import org.slf4j.LoggerFactory
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Repository
 import reactor.adapter.rxjava.RxJava2Adapter
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import urlshortener.exception.InternalServerError
 import urlshortener.domain.Click
 import urlshortener.repository.ClickRepository
 
@@ -28,15 +27,12 @@ class ClickRepositoryImpl(val db: Database) : ClickRepository {
             )
     }
 
-    override fun findByShortURL(id: String, page: Pageable): Flux<Click> {
-        val sort = page.sort.toString().replace(":","").split(' ')
-        return Flux.from(
-            db.select("SELECT * FROM click WHERE shortId=? ORDER BY ? LIMIT ? OFFSET ?")
-                .parameters(id, sort,
+    override fun findByShortURL(id: String, page: Pageable): Flux<Click> = Flux.from(
+            db.select("SELECT * FROM click WHERE shortId=? LIMIT ? OFFSET ?")
+                .parameters(id,
                             page.pageSize, page.pageNumber * page.pageSize)
                 .get(rowMapper)
         )
-    }
 
     override fun save(cl: Click): Mono<Click> {
         cl.clickId = Mono.from(db.update(

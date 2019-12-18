@@ -5,7 +5,6 @@ import com.google.zxing.qrcode.QRCodeWriter
 import java.awt.Color
 import java.awt.image.BufferedImage
 import java.io.ByteArrayOutputStream
-import java.time.LocalDateTime
 import java.util.*
 import javax.imageio.ImageIO
 import khttp.post
@@ -24,6 +23,8 @@ import redis.clients.jedis.Jedis
 import urlshortener.domain.ShortURL
 import urlshortener.exception.BadRequestError
 import urlshortener.repository.ShortURLRepository
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 
 @Service
 public class ShortURLService(private val shortURLRepository: ShortURLRepository) {
@@ -34,10 +35,6 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
 
     @Value("\${google.safebrowsing.api_key}")
     var safeBrowsingKey: String? = null
-
-    // Necessary for self-invocation of cache function
-    @Autowired
-    private val shortURLService: ShortURLService? = null
 
     @Autowired
     private val env: Environment? = null
@@ -65,17 +62,13 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
             su = validateVanity(su).block()!!
         }
         // Save and start checking safe browsing
-        checkSafeBrowsing(su)
+        GlobalScope.async {
+            checkSafeBrowsing(su).block()!!
+        }
         return shortURLRepository.save(su)
     }
 
-    fun generateQR(qrCodeText: String, size: Int = 400): Mono<String>? {
-        if (shortURLService != null) {
-            return Mono.just(shortURLService.generateQRString(qrCodeText, size))
-        } else {
-            return null
-        }
-    }
+    fun generateQR(qrCodeText: String, size: Int = 400): Mono<String> = Mono.just(generateQRString(qrCodeText, size))
 
     @Cacheable("qrs", key = "#qrCodeText")
     fun generateQRString(qrCodeText: String, size: Int = 400): String {
@@ -108,13 +101,19 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
         }
     }
 
+    public fun canRedirect(su: ShortURL): Boolean = su.active && su.safe!!
+
     public fun checkSafeBrowsing(su: ShortURL): Mono<ShortURL> =
-        Mono.fromSupplier{ shortURLService!!.safeBrowsing(su) }.subscribeOn(Schedulers.elastic())
+        Mono.fromSupplier { safeBrowsing(su) }
+        .filter(this::canRedirect)
+        .flatMap(shortURLRepository::markGood)
 
     @Cacheable("safeURLs", key = "#su.id", unless = "!#result.safe")
     fun safeBrowsing(su: ShortURL): ShortURL {
-        simulateSlowService()
-        su.safe = su.target?.let { isSafe(it) }
+        simulateSlowService()    
+        val safeness = su.target?.let { isSafe(it) }
+        su.safe = safeness
+        su.active = safeness!!
         return su
     }
 
@@ -126,7 +125,7 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
                 "threatEntries" to listOf(mapOf("url" to url)))
         // khttp 0.1.0 doesn't allow async petitions, and there are no upgrades available
         val r = post("https://safebrowsing.googleapis.com/v4/threatMatches:find?key=$safeBrowsingKey",
-                data = JSONObject(mapOf("client" to mapClient, "threatInfo" to mapThreatInfo)), timeout = 1.0)
+                data = JSONObject(mapOf("client" to mapClient, "threatInfo" to mapThreatInfo)), timeout = 5.0)
         return JSONObject(r.text).length() == 0
     }
 
@@ -134,7 +133,7 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
         try {
             // URL should not be accessible in the first 20 seconds
             // afters 20s execute safe check
-            val time = 20000L
+            val time = 4000L
             Thread.sleep(time)
         } catch (e: InterruptedException) {
             throw IllegalStateException(e)
@@ -168,12 +167,11 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
         for (cachedString in jedis.keys("safeURLs::*")) {
             val parts = cachedString.split(":", limit = 3)
             val cachedId = parts[2]
-            val url = shortURLService?.obtainUrl(cachedId)
-            if (url != null) {
-                println("Checking if the url ${url.target} is safe")
-                if (!url.target?.let { isSafe(it) }!!) {
-                    url.target?.let { shortURLService?.removeUrl(it) }
-                    println("The url $url.target is not safe")
+            with(obtainUrl(cachedId)) {
+                println("Checking if the url $target is safe")
+                if (!target?.let { isSafe(it) }!!) {
+                    target?.let { removeUrl(it) }
+                    println("The url $target is not safe")
                 }
             }
         }

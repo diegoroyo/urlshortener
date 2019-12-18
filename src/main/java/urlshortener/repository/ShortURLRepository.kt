@@ -13,7 +13,9 @@ interface ShortURLRepository {
 
     fun save(su: ShortURL): Mono<ShortURL>
 
-    fun mark(su: ShortURL, safeness: Boolean): Mono<ShortURL>
+    fun markGood(su: ShortURL): Mono<ShortURL>
+
+    fun markBad(su: ShortURL): Mono<ShortURL>
 
     fun update(su: ShortURL): Mono<Void>
 

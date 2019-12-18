@@ -2,12 +2,10 @@ package urlshortener.service
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.stereotype.Service
-import org.springframework.data.domain.Pageable
-import org.springframework.data.domain.Sort
 import org.springframework.data.domain.PageRequest
-import reactor.core.publisher.Mono
+import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
 import urlshortener.domain.Click
 import urlshortener.repository.ClickRepository
 
@@ -35,21 +33,6 @@ class ClickService(private val clickRepository: ClickRepository) {
     fun getClicksFromURL(
         shortId: String,
         pageNumber: Int,
-        pageSize: Int,
-        sortAttr: String?,
-        ascending: Boolean?
-    ): Flux<Click> {
-        // TODO: check if it works correctly
-        val page: Pageable = if (sortAttr == null || ascending == null) {
-            PageRequest.of(pageNumber, pageSize, Sort.by("clickId").ascending())
-        } else {
-            if (ascending) {
-                PageRequest.of(pageNumber, pageSize, Sort.by(sortAttr).ascending())
-            } else {
-                PageRequest.of(pageNumber, pageSize, Sort.by(sortAttr).descending())
-            }
-        }
-        print(page.sort.toString().replace(":", ""))
-        return clickRepository.findByShortURL(shortId, page)
-    }
+        pageSize: Int
+    ): Flux<Click> = clickRepository.findByShortURL(shortId, PageRequest.of(pageNumber, pageSize))
 }

@@ -41,13 +41,21 @@ class ShortURLRepositoryImpl(val db: Database) : ShortURLRepository {
         return Mono.just(su)
     }
 
-    override fun mark(su: ShortURL, safeness: Boolean): Mono<ShortURL> {
+    override fun markGood(su: ShortURL): Mono<ShortURL> {
         RxJava2Adapter.completableToMono(
-            db.update("UPDATE shorturl SET safe=? WHERE id=?")
-              .parameters(safeness, su.id)
+            db.update("UPDATE shorturl SET safe=?, active=? WHERE id=?")
+              .parameters(true, true, su.id)
               .complete()
         ).block()
-        su.safe = safeness
+        return Mono.just(su)
+    }
+
+    override fun markBad(su: ShortURL): Mono<ShortURL> {
+        RxJava2Adapter.completableToMono(
+            db.update("UPDATE shorturl SET safe=?, active=? WHERE id=?")
+              .parameters(false, false, su.id)
+              .complete()
+        ).block()
         return Mono.just(su)
     }
 
