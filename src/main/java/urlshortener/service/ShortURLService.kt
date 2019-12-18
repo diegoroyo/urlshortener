@@ -165,12 +165,7 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
     @Scheduled(fixedRate = 600000) // 600 segundos
     fun reviewSafeURLs() {
         val port = env?.getProperty("spring.redis.port");
-        var jedis: Jedis;
-        if (port != null) {
-            jedis = Jedis(env?.getProperty("spring.redis.host"), port.toInt());
-        } else {
-            jedis = Jedis(env?.getProperty("spring.redis.host"), 6379);
-        }
+        var jedis = Jedis(env?.getProperty("spring.redis.host"), port!!.toInt());
         for (cachedString in jedis.keys("safeURLs::*")) {
             val parts = cachedString.split(":", limit = 3)
             val cachedId = parts[2]
