@@ -79,7 +79,7 @@ class UrlShortenerController(private val shortUrlService: ShortURLService, priva
         @RequestParam(value = "url", required = true)
         @Pattern(regexp = "^http://\$serverIp:\$serverPort/.*") url: String
     ): Mono<String>? {
-        shortUrlService.findByKey(url.substring("http://\$serverIp:\$serverPort/".length))
+        shortUrlService.findByKey(url.substring("http://$serverIp:$serverPort/".length))
         return shortUrlService.generateQR(url)
     }
 
