@@ -25,7 +25,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 
 
-open class UrlShortenerTests {
+open class QRServiceTests {
 
     private var mockMvc: MockMvc? = null
 
@@ -46,15 +46,24 @@ open class UrlShortenerTests {
 
     @Test
     @Throws(Exception::class)
-    open fun thatRedirectToReturnsTemporaryRedirectIfKeyExists() {
-        `when`(shortUrlService!!.findByKey("someKey")).thenReturn(Mono.just(someUrl()))
-        mockMvc!!.perform(get("/{id}", "someKey")).andDo(print())
-                .andExpect(status().isTemporaryRedirect)
-                .andExpect(redirectedUrl("http://example.com/"))
+    open fun generateValidQR() {
+        // peticion a /manage/qr
+        // - codigo 200, qr correcto etc
     }
 
-    open fun someUrl(): ShortURL {
-        return ShortURL(id="someKey", target="http://example.com/", created = null, mode = 307, active = true,
-                safe = true, IP = null)
+    @Test
+    @Throws(Exception::class)
+    open fun generateInvalidQR() {
+        // peticion a /manage/qr
+        // - codigo 400
+    }
+
+    @Test
+    @Throws(Exception::class)
+    open fun testQRcache() {
+        // peticion a /manage/qr
+        // - funciona bien, tarda un tiempo
+        // peticion a /manage/qr
+        // - resultado cacheado, rapido
     }
 }
