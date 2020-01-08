@@ -84,7 +84,7 @@ class UrlShortenerController(private val shortUrlService: ShortURLService, priva
         return shortUrlService.generateQR(url)
     }
 
-    @GetMapping("/api/statistics")
+    @GetMapping("/manage/statistics")
     fun getStatistics(
         @RequestParam(value = "short", required = true) short: String,
         @RequestParam(value = "pageNumber", required = true) pageNumber: Int,

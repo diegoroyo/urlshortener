@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository
 import reactor.adapter.rxjava.RxJava2Adapter
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import urlshortener.exception.NotFoundError
 import urlshortener.domain.ShortURL
 import urlshortener.repository.ShortURLRepository
 
@@ -27,7 +28,7 @@ class ShortURLRepositoryImpl(val db: Database) : ShortURLRepository {
             )
     }
 
-    override fun findByKey(id: String): Mono<ShortURL> = Mono.from(db.select("SELECT * FROM shorturl WHERE id=?").parameters(id).get(rowMapper))
+    override fun findByKey(id: String): Mono<ShortURL> = Mono.from(db.select("SELECT * FROM shorturl WHERE id=?").parameters(id).get(rowMapper)).switchIfEmpty(Mono.error(NotFoundError("ShortURL no encontrada")))
 
     override fun findByTarget(target: String): Flux<ShortURL> =
         Flux.from(db.select("SELECT * FROM shorturl WHERE target = ?").parameters(target).get(rowMapper))

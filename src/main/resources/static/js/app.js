@@ -66,9 +66,10 @@ function eventStatistics(event) {
         url: "/api/statistics",
         data: "short=" + $(this).serializeArray()[0].value + "&pageNumber=" + pageNum + "&pageSize=" + pageSize,
         success: function (msg) {
+            console.log(msg[0]);
             $('#statistics-head').removeAttr('hidden');
             var table = '';
-            msg.forEach(function (click) {
+            msg[0].forEach(function (click) {
                 table += "<tr>"
                     + "<th scope=\"row\">" + click.clickId + "</th>"
                     + "<td>" + click.created + "</td>"
