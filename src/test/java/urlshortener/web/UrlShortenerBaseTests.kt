@@ -10,16 +10,9 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirec
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import reactor.core.publisher.Mono
 import urlshortener.domain.ShortURL
-import urlshortener.service.ClickService
 import urlshortener.service.ShortURLService
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
-import java.net.URI
-import org.hamcrest.Matchers.`is`
-import org.hamcrest.Matchers.nullValue
 import org.junit.Test
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.`when`
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
@@ -28,9 +21,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 open class UrlShortenerBaseTests {
 
     private var mockMvc: MockMvc? = null
-
-    @Mock
-    private val clickService: ClickService? = null
 
     @Mock
     private val shortUrlService: ShortURLService? = null
@@ -61,6 +51,16 @@ open class UrlShortenerBaseTests {
         // - codigo 201, respuesta correcta
         // ver que la redirección es correcta
         // - codigo 307, redirecciona a una url correcta
+
+        // Creates a random URL
+        val url = exampleURL()
+
+        // When the save function is called with the created URLs parameters, return the URL
+        `when`(shortUrlService!!.save(url.target!!, url.IP!!)).thenReturn(Mono.just(url))
+
+        // Create a POST request with the target of the created URL and check that it returns the status 201
+        mockMvc!!.perform(post("/manage/link").param("url", url.target)).andDo(print())
+                .andExpect(status().isCreated)
     }
 
     @Test
@@ -70,10 +70,20 @@ open class UrlShortenerBaseTests {
         // - todas devuelven código 400
         // ver que la redirección es correcta
         // - código 404 ya que las URL son inválidas y no se guardan
+
+        // Creates a random URL
+        val url = exampleURL()
+
+        // When the save function is called with the created URLs parameters, return the URL
+        `when`(shortUrlService!!.save(url.target!!, url.IP!!)).thenReturn(null)
+
+        // Create a POST request with the target of the created URL and check that it returns the status 201
+        mockMvc!!.perform(post("/manage/link").param("url", url.target)).andDo(print())
+                .andExpect(status().isCreated)
     }
 
     open fun exampleURL(): ShortURL {
         return ShortURL(id="someKey", target="http://example.com/", created = null, mode = 307, active = true,
-                safe = true, IP = null)
+                safe = true, IP = "127.0.0.1")
     }
 }

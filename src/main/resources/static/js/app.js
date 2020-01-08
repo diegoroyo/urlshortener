@@ -48,6 +48,7 @@ function eventShortUrl(event) {
             }
         },
         error: function (error) {
+
             $("#result").html(
                 "<div class='alert alert-danger lead'>" + JSON.parse(error.responseText).message + "</div>");
         }

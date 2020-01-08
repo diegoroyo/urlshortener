@@ -65,5 +65,6 @@ open class QRServiceTests {
         // - funciona bien, tarda un tiempo
         // peticion a /manage/qr
         // - resultado cacheado, rapido
+
     }
 }

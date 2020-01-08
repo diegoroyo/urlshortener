@@ -46,11 +46,11 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
         // Valid URL
         val urlValidator = UrlValidator(arrayOf("http", "https"))
         if (!urlValidator.isValid(url)) {
-            return Mono.error(BadRequestError("Invalid URL to short"))
+            throw BadRequestError("Invalid URL to short")
         }
         // Valid vanity
         if (!vanity.isNullOrBlank() && vanity in BANNED_VANITY) {
-            return Mono.error(BadRequestError("Vanity cannot start with " + vanity))
+            throw BadRequestError("Vanity cannot start with $vanity")
         }
         var su = ShortURLBuilder()
                 .target(url, vanity)

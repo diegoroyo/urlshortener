@@ -11,6 +11,7 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import urlshortener.exception.NotFoundError
 import urlshortener.domain.ShortURL
+import urlshortener.exception.ConflictError
 import urlshortener.repository.ShortURLRepository
 
 @Repository
@@ -35,11 +36,15 @@ class ShortURLRepositoryImpl(val db: Database) : ShortURLRepository {
     ).switchIfEmpty(Mono.error(NotFoundError("There are no ShortURLs with that key")))
 
     override fun save(su: ShortURL): Mono<ShortURL> {
-        RxJava2Adapter.completableToMono(
-            db.update("INSERT INTO shorturl VALUES (?,?,?,?,?,?,?)")
-              .parameters(su.id, su.target, su.created, su.mode, su.active, su.safe, su.IP)
-              .complete()
-        ).block()
+        try {
+            RxJava2Adapter.completableToMono(
+                    db.update("INSERT INTO shorturl VALUES (?,?,?,?,?,?,?)")
+                            .parameters(su.id, su.target, su.created, su.mode, su.active, su.safe, su.IP)
+                            .complete()
+            ).block()
+        } catch (e: Exception) {
+            throw ConflictError("There already exists a URL with that vanity")
+        }
         return Mono.just(su)
     }
 
