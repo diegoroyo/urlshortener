@@ -16,6 +16,10 @@ import org.junit.Test
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import urlshortener.exception.BadRequestError
+import urlshortener.exception.ConflictError
+import urlshortener.exception.NotFoundError
+import urlshortener.service.ClickService
 
 
 open class UrlShortenerBaseTests {
@@ -24,6 +28,9 @@ open class UrlShortenerBaseTests {
 
     @Mock
     private val shortUrlService: ShortURLService? = null
+
+    @Mock
+    private val clickService: ClickService? = null
 
     @InjectMocks
     private val urlShortener: UrlShortenerController? = null
@@ -38,10 +45,15 @@ open class UrlShortenerBaseTests {
     @Throws(Exception::class)
     // TODO quitar este test cuando terminemos
     open fun redireccionExito() {
-        `when`(shortUrlService!!.findByKey("someKey")).thenReturn(Mono.just(exampleURL()))
-        mockMvc!!.perform(get("/{id}", "someKey")).andDo(print())
+
+        // Create a random URL
+        val url = exampleURL()
+
+        // When the find function is called return the example URL
+        `when`(shortUrlService!!.findByKey(url.id!!)).thenReturn(Mono.just(url))
+        mockMvc!!.perform(get("/{id}", url.id)).andDo(print())
                 .andExpect(status().isTemporaryRedirect)
-                .andExpect(redirectedUrl("http://example.com/"))
+                .andExpect(redirectedUrl(url.target!!))
     }
 
     @Test
@@ -61,6 +73,14 @@ open class UrlShortenerBaseTests {
         // Create a POST request with the target of the created URL and check that it returns the status 201
         mockMvc!!.perform(post("/manage/link").param("url", url.target)).andDo(print())
                 .andExpect(status().isCreated)
+
+        // When the find function is called return the example URL
+        `when`(shortUrlService.findByKey(url.id!!)).thenReturn(Mono.just(exampleURL()))
+
+        // Create a GET request with the created link and check it returns 307 status
+        mockMvc!!.perform(get("/{id}", url.id)).andDo(print())
+                .andExpect(status().isTemporaryRedirect)
+                .andExpect(redirectedUrl(url.target!!))
     }
 
     @Test
@@ -74,12 +94,25 @@ open class UrlShortenerBaseTests {
         // Creates a random URL
         val url = exampleURL()
 
-        // When the save function is called with the created URLs parameters, return the URL
-        `when`(shortUrlService!!.save(url.target!!, url.IP!!)).thenReturn(null)
+        // When the save function is called with the created URLs parameters, throw first a BadRequestError exception
+        // and after a ConflictError exception
+        `when`(shortUrlService!!.save(url.target!!, url.IP!!)).thenThrow(BadRequestError("The URL is incorrect"))
+                .thenThrow(ConflictError("There is already a URL with that vanity"))
 
         // Create a POST request with the target of the created URL and check that it returns the status 201
         mockMvc!!.perform(post("/manage/link").param("url", url.target)).andDo(print())
-                .andExpect(status().isCreated)
+                .andExpect(status().isBadRequest)
+
+        // Create a POST request with the target of the created URL and check that it returns the status 201
+        mockMvc!!.perform(post("/manage/link").param("url", url.target)).andDo(print())
+                .andExpect(status().isConflict)
+
+        // When the find function is called throw a NotFoundErrorException
+        `when`(shortUrlService.findByKey(url.id!!)).thenThrow(NotFoundError("There is no URL with the given identifier"))
+
+        // Create a GET request with the created link and check it returns 404 status
+        mockMvc!!.perform(get("/{id}", url.id)).andDo(print())
+                .andExpect(status().isNotFound)
     }
 
     open fun exampleURL(): ShortURL {

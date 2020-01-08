@@ -111,6 +111,7 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
         return JSONObject(r.text).length() == 0
     }
 
+    // TODO: quitar?
     private fun simulateSlowService() {
         try {
             // URL should not be accessible in the first 20 seconds
