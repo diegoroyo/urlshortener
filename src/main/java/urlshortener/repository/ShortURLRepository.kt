@@ -9,8 +9,6 @@ interface ShortURLRepository {
 
     fun findByKey(id: String): Mono<ShortURL>
 
-    fun findByTarget(target: String): Flux<ShortURL>
-
     fun save(su: ShortURL): Mono<ShortURL>
 
     fun markGood(su: ShortURL): Mono<ShortURL>

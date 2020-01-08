@@ -28,10 +28,11 @@ class ShortURLRepositoryImpl(val db: Database) : ShortURLRepository {
             )
     }
 
-    override fun findByKey(id: String): Mono<ShortURL> = Mono.from(db.select("SELECT * FROM shorturl WHERE id=?").parameters(id).get(rowMapper)).switchIfEmpty(Mono.error(NotFoundError("ShortURL no encontrada")))
-
-    override fun findByTarget(target: String): Flux<ShortURL> =
-        Flux.from(db.select("SELECT * FROM shorturl WHERE target = ?").parameters(target).get(rowMapper))
+    override fun findByKey(id: String): Mono<ShortURL> = Mono.from(
+        db.select("SELECT * FROM shorturl WHERE id=?")
+          .parameters(id)
+          .get(rowMapper)
+    ).switchIfEmpty(Mono.error(NotFoundError("There are no ShortURLs with that key")))
 
     override fun save(su: ShortURL): Mono<ShortURL> {
         RxJava2Adapter.completableToMono(
