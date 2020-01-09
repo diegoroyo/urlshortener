@@ -33,6 +33,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
 import org.springframework.test.context.TestPropertySource
 import org.mockito.AdditionalAnswers
 import org.mockito.Mockito
+import urlshortener.util.*
+import org.junit.Ignore
 
 @RunWith(SpringJUnit4ClassRunner::class)
 @TestPropertySource(locations = arrayOf("/application.properties"))
@@ -56,6 +58,7 @@ open class SafeBrowsingTests{
     }
 
     @Test
+    @Ignore // TODO quitar (evitar demasiadas peticiones)
     @Throws(Exception::class)
     open fun checkSafeURL() {
         val su = genURL("valid", VALID_URL)
@@ -66,6 +69,7 @@ open class SafeBrowsingTests{
     }
 
     @Test
+    @Ignore // TODO quitar (evitar demasiadas peticiones)
     @Throws(Exception::class)
     open fun checkUnsafeURL() {
         val su = genURL("malware", MALWARE_URL)
@@ -73,10 +77,5 @@ open class SafeBrowsingTests{
         val ret = shortUrlService!!.safeBrowsing(su)
         assertEquals(ret.active, false)
         assertEquals(ret.safe, false)
-    }
-    
-    open fun genURL(id: String, target: String): ShortURL {
-        return ShortURL(id=id, target=target, created = null, mode = 307, active = false,
-                safe = null, IP = null)
     }
 }

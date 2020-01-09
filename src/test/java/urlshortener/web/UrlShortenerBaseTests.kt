@@ -20,6 +20,7 @@ import urlshortener.exception.BadRequestError
 import urlshortener.exception.ConflictError
 import urlshortener.exception.NotFoundError
 import urlshortener.service.ClickService
+import urlshortener.util.*
 
 
 open class UrlShortenerBaseTests {
@@ -113,10 +114,5 @@ open class UrlShortenerBaseTests {
         // Create a GET request with the created link and check it returns 404 status
         mockMvc!!.perform(get("/{id}", url.id)).andDo(print())
                 .andExpect(status().isNotFound)
-    }
-
-    open fun exampleURL(): ShortURL {
-        return ShortURL(id="someKey", target="http://example.com/", created = null, mode = 307, active = true,
-                safe = true, IP = "127.0.0.1")
     }
 }

@@ -84,9 +84,4 @@ open class UrlShortenerVanityTests {
         // ver que la redirección es correcta
         // - código 404 ya que las URL son inválidas y no se guardan
     }
-
-    open fun exampleURL(): ShortURL {
-        return ShortURL(id="someKey", target="http://example.com/", created = null, mode = 307, active = true,
-                safe = true, IP = null)
-    }
 }

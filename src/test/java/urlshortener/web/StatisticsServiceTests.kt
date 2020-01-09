@@ -19,6 +19,7 @@ import urlshortener.domain.Click
 import urlshortener.domain.ShortURL
 import urlshortener.service.ClickService
 import urlshortener.service.ShortURLService
+import urlshortener.util.*
 
 
 open class StatisticsServiceTests {
@@ -105,15 +106,5 @@ open class StatisticsServiceTests {
                 .param("pageSize", url.target)
                 .param("pageNumber", "1")).andDo(print())
                 .andExpect(status().isBadRequest)
-    }
-
-    // TODO: impor from a common class?
-    open fun exampleURL(): ShortURL {
-        return ShortURL(id="someKey", target="http://example.com/", created = null, mode = 307, active = true,
-                safe = true, IP = "127.0.0.1")
-    }
-
-    open fun exampleClick(): Click {
-        return Click(1, "http://example.com", null, "referer", "firefox", "linux")
     }
 }
