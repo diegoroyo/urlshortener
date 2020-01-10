@@ -12,7 +12,7 @@ fun exampleClick(): Click {
     return Click(1, "http://example.com", null, "referer", "firefox", "linux")
 }
     
-fun genURL(id: String, target: String): ShortURL {
+fun genURL(id: String?, target: String): ShortURL {
     return ShortURL(id=id, target=target, created = null, mode = 307, active = false,
-            safe = null, IP = null)
+            safe = null, IP = "127.0.0.1")
 }

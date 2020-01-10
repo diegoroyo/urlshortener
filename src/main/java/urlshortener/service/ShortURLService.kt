@@ -32,7 +32,6 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
 
     private val REGEX_BRACKET = Regex("\\{[a-z]+\\}", setOf(RegexOption.IGNORE_CASE))
     private val REGEX_VANITY = Regex("[a-z]+\\/(\\{[a-z]+\\})", setOf(RegexOption.IGNORE_CASE))
-    private val BANNED_VANITY = listOf("api", "swagger-ui")
 
     @Value("\${google.safebrowsing.api_key}")
     var safeBrowsingKey: String? = null
@@ -45,11 +44,11 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
     public fun save(url: String, ip: String, vanity: String? = null): Mono<ShortURL> {
         // Valid URL
         val urlValidator = UrlValidator(arrayOf("http", "https"))
-        if (!urlValidator.isValid(url)) {
+        if (!urlValidator.isValid(url.replace("{", "").replace("}", ""))) {
             throw BadRequestError("Invalid URL to short")
         }
         // Valid vanity
-        if (!vanity.isNullOrBlank() && vanity in BANNED_VANITY) {
+        if (!vanity.isNullOrBlank() && (vanity.startsWith("api") || vanity == "swagger-ui")) {
             throw BadRequestError("Vanity cannot start with $vanity")
         }
         var su = ShortURLBuilder()
@@ -124,16 +123,16 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
     }
 
     public fun validateVanity(su: ShortURL): Mono<ShortURL> {
-        val matchVanity = REGEX_BRACKET.find(su.id!!)?.groups
-        val matchUrl = REGEX_BRACKET.find(su.target!!)?.groups
-        if (matchVanity != null && matchUrl != null) {
+        val matchVanity = REGEX_BRACKET.findAll(su.id!!).toList()
+        val matchUrl = REGEX_BRACKET.findAll(su.target!!).toList()
+        if (matchVanity.count() > 0 && matchUrl.count() > 0) {
             // Same length
-            if (matchUrl.count() != 1 || matchUrl.count() != 1) {
+            if (matchVanity.count() != 1 || matchUrl.count() != 1) {
                 return Mono.error(BadRequestError("URL and vanity should only have one group"))
             }
             // Not repeated
-            val stringVanity = matchVanity.get(0)!!.value
-            val stringUrl = matchVanity.get(0)!!.value
+            val stringVanity = matchVanity.get(0).value
+            val stringUrl = matchUrl.get(0).value
             if (stringVanity != stringUrl) {
                 return Mono.error(BadRequestError("Vanity groups don't match"))
             }
