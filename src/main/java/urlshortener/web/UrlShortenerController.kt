@@ -77,12 +77,12 @@ class UrlShortenerController(private val shortUrlService: ShortURLService, priva
     fun generateQr(
         @RequestParam(value = "url", required = true)
         @Pattern(regexp = "^http://\$serverIp:\$serverPort/.*") url: String
-    ): Mono<String>? {
-        shortUrlService.findByKey(url.substring("http://$serverIp:$serverPort/".length))
+    ): Mono<String> {
+        shortUrlService.findByKey(url.substring("http://$serverIp:$serverPort/".length)).block()!!
         return shortUrlService.generateQR(url)
     }
 
-    @GetMapping("/manage/statistics")
+    @GetMapping("/api/statistics")
     fun getStatistics(
         @RequestParam(value = "short", required = true) short: String,
         @RequestParam(value = "pageNumber", required = true) pageNumber: Int,

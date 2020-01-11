@@ -1,15 +1,14 @@
 package urlshortener.service
 
 import com.google.zxing.BarcodeFormat
+import com.google.zxing.client.j2se.MatrixToImageWriter
 import com.google.zxing.qrcode.QRCodeWriter
-import java.awt.Color
-import java.awt.image.BufferedImage
 import java.io.ByteArrayOutputStream
 import java.util.*
-import javax.imageio.ImageIO
 import khttp.post
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 import org.apache.commons.validator.routines.UrlValidator
-import com.google.zxing.client.j2se.MatrixToImageWriter
 import org.json.JSONObject
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -19,13 +18,13 @@ import org.springframework.core.env.Environment
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
-import reactor.core.scheduler.Schedulers
 import redis.clients.jedis.Jedis
 import urlshortener.domain.ShortURL
 import urlshortener.exception.BadRequestError
 import urlshortener.repository.ShortURLRepository
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
+import urlshortener.exception.ServiceUnavailableError
+import java.time.Duration
+import reactor.core.scheduler.Schedulers
 
 @Service
 public class ShortURLService(private val shortURLRepository: ShortURLRepository) {
@@ -68,10 +67,17 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
         return shortURLRepository.save(su)
     }
 
-    fun generateQR(qrCodeText: String, size: Int = 400): Mono<String> = Mono.just(generateQRString(qrCodeText, size))
-
+    fun generateQR(qrCodeText: String, size: Int = 400): Mono<String> {
+        val result = Mono.fromSupplier { generateQRString(qrCodeText, size) }
+            .subscribeOn(Schedulers.elastic())
+            .timeout(Duration.ofSeconds(1L),
+                Mono.error<String>(ServiceUnavailableError("QR image termporarily unavailable"))).block()!!
+        return Mono.just(result)
+    }
     @Cacheable("qrs", key = "#qrCodeText")
     fun generateQRString(qrCodeText: String, size: Int = 400): String {
+        // Trigger QR fallback:
+        // simulateSlowService()
         // Create the ByteMatrix for the QR-Code that encodes the given String
         val byteMatrix = QRCodeWriter().encode(qrCodeText, BarcodeFormat.QR_CODE, size, size)
         val baos = ByteArrayOutputStream()
@@ -91,7 +97,7 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
 
     @Cacheable("safeURLs", key = "#su.id", unless = "!#result.safe")
     fun safeBrowsing(su: ShortURL): ShortURL {
-        simulateSlowService()    
+        simulateSlowService()
         val safeness = su.target?.let { isSafe(it) }
         su.safe = safeness
         su.active = safeness!!
@@ -110,16 +116,14 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
         return JSONObject(r.text).length() == 0
     }
 
-    // TODO: quitar?
+    // Debug purposes
     private fun simulateSlowService() {
         try {
             // URL should not be accessible in the first 20 seconds
             // afters 10s execute safe check
             val time = 10000L
             Thread.sleep(time)
-        } catch (e: InterruptedException) {
-            throw IllegalStateException(e)
-        }
+        } catch (e: InterruptedException) {}
     }
 
     public fun validateVanity(su: ShortURL): Mono<ShortURL> {
@@ -145,8 +149,8 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
 
     @Scheduled(fixedRate = 600000) // 600 segundos
     fun reviewSafeURLs() {
-        val port = env?.getProperty("spring.redis.port");
-        var jedis = Jedis(env?.getProperty("spring.redis.host"), port!!.toInt());
+        val port = env?.getProperty("spring.redis.port")
+        var jedis = Jedis(env?.getProperty("spring.redis.host"), port!!.toInt())
         for (cachedString in jedis.keys("safeURLs::*")) {
             val parts = cachedString.split(":", limit = 3)
             val cachedId = parts[2]

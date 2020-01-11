@@ -15,3 +15,6 @@ class ConflictError(message: String) : RuntimeException(message)
 
 @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 class InternalServerError(message: String) : RuntimeException(message)
+
+@ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+class ServiceUnavailableError(message: String) : RuntimeException(message)
