@@ -1,3 +1,14 @@
+/*
+ *******************************************
+ *** Urlshortener - Web Engineering ********
+ *** Authors: Name  ************************
+ *** Andrew Mackay - 737069 ****************
+ *** Ruben Rodríguez Esteban - 737215 ******
+ *** Diego Royo Meneses - 740388 ***********
+ *** Course: 2019 - 2020 *******************
+ *******************************************
+ */ 
+
 package urlshortener.web
 
 import java.net.URI
@@ -17,9 +28,14 @@ import urlshortener.exception.NotFoundError
 import urlshortener.service.ClickService
 import urlshortener.service.ShortURLService
 
+
+// Urlshortener controller
+
+
 @RestController
 class UrlShortenerController(private val shortUrlService: ShortURLService, private val clickService: ClickService) {
 
+    // Expresions to control the regex of operating systems and client browsers
     private val REGEX_BROWSER = Regex("(?i)(firefox|msie|chrome|safari)[\\/\\s]([\\d.]+)")
     private val REGEX_OS = Regex("Windows|Linux|Mac")
 
@@ -38,6 +54,11 @@ class UrlShortenerController(private val shortUrlService: ShortURLService, priva
         return shortUrlService.save(url, request.remoteAddr, vanity)
     }
 
+
+
+     /**
+     * Redirection to new url shortened
+     */
     @GetMapping(value = ["/{id:(?!swagger-ui|index)\\w+}", "/{id:(?!swagger-ui|index)\\w+}/{vanity:\\w+}"])
     fun redirectTo(
         @PathVariable id: String,
@@ -61,6 +82,7 @@ class UrlShortenerController(private val shortUrlService: ShortURLService, priva
         var browser: String? = null
         var platform: String? = null
         userAgent?.let {
+            // Get browser and platform from http headers
             browser = REGEX_BROWSER.find(userAgent)?.value
             platform = REGEX_OS.find(userAgent)?.value
         }
@@ -73,6 +95,10 @@ class UrlShortenerController(private val shortUrlService: ShortURLService, priva
         return ResponseEntity.status(HttpStatus.valueOf(su?.mode!!)).headers(h).build()
     }
 
+
+     /**
+     * Generation of qr image
+     */
     @GetMapping("/manage/qr")
     fun generateQr(
         @RequestParam(value = "url", required = true)
@@ -82,6 +108,10 @@ class UrlShortenerController(private val shortUrlService: ShortURLService, priva
         return shortUrlService.generateQR(url)
     }
 
+
+    /**
+     * Get statistics
+     */
     @GetMapping("/api/statistics")
     fun getStatistics(
         @RequestParam(value = "short", required = true) short: String,

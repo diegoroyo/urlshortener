@@ -1,3 +1,14 @@
+/*
+ *******************************************
+ *** Urlshortener - Web Engineering ********
+ *** Authors: Name  ************************
+ *** Andrew Mackay - 737069 ****************
+ *** Ruben Rodríguez Esteban - 737215 ******
+ *** Diego Royo Meneses - 740388 ***********
+ *** Course: 2019 - 2020 *******************
+ *******************************************
+ */ 
+
 package urlshortener.service
 
 import org.slf4j.Logger
@@ -13,8 +24,19 @@ import urlshortener.exception.BadRequestError
 @Service
 class ClickService(private val clickRepository: ClickRepository) {
 
+    // Logger to control the trace of events
     private val log: Logger = LoggerFactory.getLogger(ClickService::class.java)
 
+
+    /**
+     * Stores the click in the database
+     * @param shortId
+     * @param clickIp
+     * @param referer
+     * @param browser
+     * @param platform
+     * @return a mono object which represents the click created
+     */
     fun saveClick(
         shortId: String,
         clickIp: String,
@@ -31,6 +53,15 @@ class ClickService(private val clickRepository: ClickRepository) {
         return Mono.just(cl)
     }
 
+
+
+     /**
+     * get clicks from a click with a specific parameters
+     * @param shortId
+     * @param pageNumber
+     * @param pageSize
+     * @returns the number of clicks
+     */
     fun getClicksFromURL(
         shortId: String,
         pageNumber: Int,

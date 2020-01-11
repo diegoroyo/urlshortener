@@ -1,3 +1,14 @@
+/*
+ *******************************************
+ *** Urlshortener - Web Engineering ********
+ *** Authors: Name  ************************
+ *** Andrew Mackay - 737069 ****************
+ *** Ruben Rodríguez Esteban - 737215 ******
+ *** Diego Royo Meneses - 740388 ***********
+ *** Course: 2019 - 2020 *******************
+ *******************************************
+ */ 
+
 package urlshortener.config
 
 import org.springframework.context.annotation.Bean
@@ -15,6 +26,9 @@ import springfox.documentation.spring.web.plugins.Docket
 @EnableSwagger2
 class SwaggerConfiguration {
 
+    /**
+     * Run the swagger service in order to document the app
+     */
     @Bean
     open fun api(): Docket = Docket(DocumentationType.SWAGGER_2)
         .select()
