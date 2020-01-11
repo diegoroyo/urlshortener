@@ -1,0 +1,23 @@
+timeStamp,elapsed,label,responseCode,responseMessage,threadName,dataType,success,failureMessage,bytes,sentBytes,grpThreads,allThreads,URL,Latency,IdleTime,Connect
+1578771408981,2773,HTTP Request,200,OK,GET vanity 1-1,text,true,,80828,307,1,1,http://www.unizar.es,2390,0,33
+1578771408981,2394,HTTP Request-0,307,,GET vanity 1-1,,true,,490,157,1,1,http://localhost:8080/adolfo,2390,0,33
+1578771411377,377,HTTP Request-1,200,OK,GET vanity 1-1,text,true,,80338,150,1,1,http://www.unizar.es,266,0,84
+1578771411761,1403,HTTP Request,200,OK,GET vanity 1-1,text,true,,80827,307,1,1,http://www.unizar.es,1086,0,2
+1578771411761,1086,HTTP Request-0,307,,GET vanity 1-1,,true,,490,157,1,1,http://localhost:8080/adolfo,1086,0,2
+1578771412848,316,HTTP Request-1,200,OK,GET vanity 1-1,text,true,,80337,150,1,1,http://www.unizar.es,154,0,0
+1578771413166,1387,HTTP Request,200,OK,GET vanity 1-1,text,true,,80828,307,1,1,http://www.unizar.es,1083,0,0
+1578771413166,1083,HTTP Request-0,307,,GET vanity 1-1,,true,,490,157,1,1,http://localhost:8080/adolfo,1083,0,0
+1578771414250,303,HTTP Request-1,200,OK,GET vanity 1-1,text,true,,80338,150,1,1,http://www.unizar.es,183,0,39
+1578771414556,1582,HTTP Request,200,OK,GET vanity 1-1,text,true,,80827,307,1,1,http://www.unizar.es,1280,0,2
+1578771414556,1280,HTTP Request-0,307,,GET vanity 1-1,,true,,490,157,1,1,http://localhost:8080/adolfo,1280,0,2
+1578771415836,302,HTTP Request-1,200,OK,GET vanity 1-1,text,true,,80337,150,1,1,http://www.unizar.es,176,0,0
+1578771416140,1306,HTTP Request,200,OK,GET vanity 1-1,text,true,,80828,307,1,1,http://www.unizar.es,926,0,0
+1578771416140,926,HTTP Request-0,307,,GET vanity 1-1,,true,,490,157,1,1,http://localhost:8080/adolfo,926,0,0
+1578771417066,380,HTTP Request-1,200,OK,GET vanity 1-1,text,true,,80338,150,1,1,http://www.unizar.es,238,0,39
+1578771417449,557,HTTP Request,429,,GET vanity 1-1,text,false,Test failed: code expected to contain /200/,446,157,1,1,http://localhost:8080/adolfo,557,0,2
+1578771435273,774,HTTP Request,429,,GET vanity 1-1,text,false,Test failed: code expected to contain /200/,446,157,1,1,http://localhost:8080/adolfo,771,0,28
+1578771436051,311,HTTP Request,429,,GET vanity 1-1,text,false,Test failed: code expected to contain /200/,446,157,1,1,http://localhost:8080/adolfo,309,0,0
+1578771436364,321,HTTP Request,429,,GET vanity 1-1,text,false,Test failed: code expected to contain /200/,446,157,1,1,http://localhost:8080/adolfo,320,0,0
+1578771436687,617,HTTP Request,429,,GET vanity 1-1,text,false,Test failed: code expected to contain /200/,446,157,1,1,http://localhost:8080/adolfo,615,0,0
+1578771437306,528,HTTP Request,429,,GET vanity 1-1,text,false,Test failed: code expected to contain /200/,446,157,1,1,http://localhost:8080/adolfo,528,0,5
+1578771437838,373,HTTP Request,429,,GET vanity 1-1,text,false,Test failed: code expected to contain /200/,446,157,1,1,http://localhost:8080/adolfo,371,0,0

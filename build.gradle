@@ -16,6 +16,7 @@ plugins {
     id 'org.springframework.boot' version '2.1.8.RELEASE'
     id 'io.spring.dependency-management' version '1.0.8.RELEASE'
     id 'java'
+    id "net.foragerr.jmeter" version "1.1.0-4.0"
 }
 
 apply plugin: 'idea'
@@ -92,6 +93,11 @@ dependencies {
     testImplementation 'org.apache.httpcomponents:httpclient'
 }
 
+
 clean.doFirst {
     delete "db"
+}
+
+jmeter {
+    jmTestFiles = [file("src/test/jmeter/shorturl.jmx")] //if jmx file is not in the default location
 }

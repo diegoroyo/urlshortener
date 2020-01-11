@@ -72,7 +72,7 @@ open class StatisticsServiceTests {
         `when`(clickService!!.getClicksFromURL(url.target!!, 1, 1)).thenReturn(Flux.just(exampleClick()))
 
         // Make a GET request to the statistics endpoint and expect a 200 status
-        mockMvc!!.perform(get("/api/statistics")
+        mockMvc!!.perform(get("/manage/statistics")
                 .param("short", url.target)
                 .param("pageNumber", "1")
                 .param("pageSize", "1")).andDo(print())
@@ -92,17 +92,17 @@ open class StatisticsServiceTests {
         `when`(clickService!!.getClicksFromURL(url.target!!, 1, 1)).thenReturn(Flux.just(exampleClick()))
 
         // Make 3 GET request with missing parameters and expect 400 status
-        mockMvc!!.perform(get("/api/statistics")
+        mockMvc!!.perform(get("/manage/statistics")
                 .param("short", url.target)
                 .param("pageNumber", "1")).andDo(print())
                 .andExpect(status().isBadRequest)
 
-        mockMvc!!.perform(get("/api/statistics")
+        mockMvc!!.perform(get("/manage/statistics")
                 .param("short", url.target)
                 .param("pageSize", "1")).andDo(print())
                 .andExpect(status().isBadRequest)
 
-        mockMvc!!.perform(get("/api/statistics")
+        mockMvc!!.perform(get("/manage/statistics")
                 .param("pageSize", url.target)
                 .param("pageNumber", "1")).andDo(print())
                 .andExpect(status().isBadRequest)

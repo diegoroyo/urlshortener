@@ -11,6 +11,7 @@
 
 package urlshortener.web
 
+import com.google.common.hash.Hashing
 import java.net.URI
 import javax.servlet.http.HttpServletRequest
 import javax.validation.constraints.Pattern
@@ -27,6 +28,7 @@ import urlshortener.exception.ConflictError
 import urlshortener.exception.NotFoundError
 import urlshortener.service.ClickService
 import urlshortener.service.ShortURLService
+import java.nio.charset.StandardCharsets
 
 
 // Urlshortener controller
@@ -51,7 +53,37 @@ class UrlShortenerController(private val shortUrlService: ShortURLService, priva
         @RequestParam(value = "vanity", required = false) vanity: String?,
         request: HttpServletRequest
     ): Mono<ShortURL> {
-        return shortUrlService.save(url, request.remoteAddr, vanity)
+        if (vanity.isNullOrEmpty()) {
+            return try {
+
+                // Check if the URL exists
+                val hash = Hashing.murmur3_32().hashString(url, StandardCharsets.UTF_8).toString()
+
+                // If it exists, return the saved instance
+                Mono.just(shortUrlService.findByKey(hash).block()!!)
+            } catch (e: Exception) {
+
+                // If doesnt exists, save the new URL
+                shortUrlService.save(url, request.remoteAddr, vanity)
+            }
+        } else {
+            return try {
+
+                // Check if vanity exists
+                val savedURLMono = shortUrlService.findByKey(vanity)
+                val savedURL = savedURLMono.block()!!
+                if (savedURL.target.equals(url)) {
+                    // If it exists, but it belongs to the same URL, return the saved instance
+                    Mono.just(savedURL)
+                } else {
+                    // If it exists, but it belongs to a different URL throw an exception
+                    throw ConflictError("There already exists a different URL with that vanity")
+                }
+            } catch (e: Exception) {
+                // If it doesnt exist, save the new URL
+                shortUrlService.save(url, request.remoteAddr, vanity)
+            }
+        }
     }
 
 
@@ -112,7 +144,7 @@ class UrlShortenerController(private val shortUrlService: ShortURLService, priva
     /**
      * Get statistics
      */
-    @GetMapping("/api/statistics")
+    @GetMapping("/manage/statistics")
     fun getStatistics(
         @RequestParam(value = "short", required = true) short: String,
         @RequestParam(value = "pageNumber", required = true) pageNumber: Int,

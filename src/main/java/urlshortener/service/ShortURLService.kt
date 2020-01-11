@@ -233,14 +233,10 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
 
     @Cacheable("safeURLs", key = "#id")
     fun obtainUrl(id: String): ShortURL {
-        // TODO: create an error if URL does not exist in cache
-        println("Error, the url $id is not saved in the cache")
         return ShortURL()
     }
 
     @CacheEvict("safeURLs", key = "#id")
     fun removeUrl(id: String) {
-        // TODO: create an error if URL does not exist in cache
-        println("Error, the url $id is not saved in the cache")
     }
 }
