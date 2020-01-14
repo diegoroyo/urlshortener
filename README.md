@@ -1,7 +1,7 @@
 # Web Engineering 2019-2020 / URL Shortener
 
 [![Build Status](https://travis-ci.org/UNIZAR-30246-WebEngineering/UrlShortener.svg?branch=master)](https://travis-ci.org/diegoroyo/urlShortener)
-[![made-with-Kotlin](https://img.shields.io/badge/Made%20with-java-e01250.svg)](https://kotlinlang.org/)
+[![made-with-Kotlin](https://img.shields.io/badge/Made%20with-kotlin-e01250.svg)](https://kotlinlang.org/)
 [![built-with-gradle](https://img.shields.io/badge/Built%20with-gradle-1a3ef3.svg)](https://gradle.org/install/)
 
 <p align="center">
