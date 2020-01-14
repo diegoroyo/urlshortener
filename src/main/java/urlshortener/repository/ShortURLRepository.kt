@@ -12,7 +12,6 @@
 
 package urlshortener.repository
 
-import org.springframework.data.domain.Pageable
 import reactor.core.publisher.Mono
 import reactor.core.publisher.Flux
 import urlshortener.domain.ShortURL
@@ -21,56 +20,63 @@ interface ShortURLRepository {
 
 
      /**
-     * @param id is the id of the url
-     * @returns a mono object with the url found
-     */
+      * Returns the saved shortened url with identifier "id".
+      * @param id Id of the url.
+      * @returns a Mono object with the url found.
+      */
     fun findByKey(id: String): Mono<ShortURL>
 
 
 
      /**
-     * @param id is the id of the url
-     * @returns a mono object with the url saved
+      * Saves a shortened url and returns the same url.
+     * @param su Shortened url to save.
+     * @returns Mono object with the url saved.
      */
     fun save(su: ShortURL): Mono<ShortURL>
 
 
     /**
-     * @param id is the id of the url
-     * @returns a mono object with the url marked as good
+     * Marks the shortened url as good.
+     * @param id is the id of the url.
+     * @returns Mono object with the url marked as good.
      */
     fun markGood(su: ShortURL): Mono<ShortURL>
 
 
     /**
-     * @param id is the id of the url
-     * @returns a mono object with the url marked as malicious
+     * Marks the shortened url as malicious.
+     * @param su Id of the url.
+     * @returns Mono object with the url marked as malicious.
      */
     fun markBad(su: ShortURL): Mono<ShortURL>
 
 
-     /**
-     * update the url shortened
-     * @param su is the url shortened
+    /**
+     * Updates a shortened url.
+     * @param su Updated shortened url.
+     * @return Updated shortened url.
      */
     fun update(su: ShortURL): Mono<Void>
 
 
      /**
-     * delete the id  of the url shortened
-     * @param id is the id of the url shortened
+     * Deletes the shortened url with identifier "id"
+     * @param id Id of the shortened url.
      */
     fun delete(id: String): Mono<Void>
 
 
     /**
-     * count the urls
+     * Returns the number of urls.
+     * @return number of urls.
      */
     fun count(): Mono<Long>
 
 
     /**
-     * list the templates
+     * Returns the list of urls.
+     * @return list of urls.
      */
     fun listTemplates(): Flux<ShortURL>
 }

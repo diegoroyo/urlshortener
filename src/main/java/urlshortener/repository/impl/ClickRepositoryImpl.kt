@@ -40,8 +40,6 @@ class ClickRepositoryImpl(val db: Database) : ClickRepository {
             )
     }
 
-
-
     /**
      * @param id is the id of the url shortened
      * @returns a url shortened from the database 
@@ -52,8 +50,6 @@ class ClickRepositoryImpl(val db: Database) : ClickRepository {
                             page.pageSize, page.pageNumber * page.pageSize)
                 .get(rowMapper)
         )
-
-
     
     /**
      * @param icld is a click
@@ -70,8 +66,6 @@ class ClickRepositoryImpl(val db: Database) : ClickRepository {
         return Mono.just(cl)
     }
 
-
-
     /**
      * @param icld is a click
      * @returns a mono object with the click updated in the database
@@ -84,8 +78,6 @@ class ClickRepositoryImpl(val db: Database) : ClickRepository {
             .complete()
     )
 
-
-
     /**
      * Delete a click from the database
      * @param id is the id of the click which is going to be deleted
@@ -93,8 +85,6 @@ class ClickRepositoryImpl(val db: Database) : ClickRepository {
     override fun delete(id: Long): Mono<Void> = RxJava2Adapter.completableToMono(db.update(
             "delete from click where clickId=?"
         ).parameters(id).complete())
-
-
 
     /**
      * @returns a mono object with the number of clicks of the database

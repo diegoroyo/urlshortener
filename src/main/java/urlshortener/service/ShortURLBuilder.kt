@@ -21,13 +21,19 @@ class ShortURLBuilder {
 
     // Id of the url
     private var id: String? = null
+
+    // Target of the url
     private var target: String? = null
+
     // Date where url was shorted
     private var created: Date? = null
+
     // Mode
     private var mode: Int? = null
+
     // Control if the url is or not is active
     private var active: Boolean = false
+
     // Control if the url is or not is spam
     private var safe: Boolean? = null
     // Ip
@@ -48,7 +54,7 @@ class ShortURLBuilder {
 
 
 
-    /*
+    /**
      * @param url is the id of the url
      * @param vanity is the vanity of the url
      * @return the short url with the shorId stored
@@ -65,7 +71,7 @@ class ShortURLBuilder {
 
 
 
-    /*
+    /**
      * @param vanity
      * @return the short url with the date stored
      */
@@ -76,7 +82,7 @@ class ShortURLBuilder {
 
 
 
-    /*
+    /**
      * @return the short url with the mode temporary redirect
      */
     fun temporaryRedirect(): ShortURLBuilder {
@@ -85,7 +91,7 @@ class ShortURLBuilder {
     }
 
 
-    /*
+    /**
      * @return the short url actived by defect
      */
     fun makeActive(): ShortURLBuilder {
@@ -94,7 +100,7 @@ class ShortURLBuilder {
     }
 
 
-    /*
+    /**
      * @return the short url safe by defect
      */
     fun treatAsSafe(): ShortURLBuilder {
@@ -103,7 +109,7 @@ class ShortURLBuilder {
     }
 
 
-    /*
+    /**
      * @param ip
      * @return the short url with the ip stored
      */

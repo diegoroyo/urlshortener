@@ -38,11 +38,10 @@ import java.time.Duration
 import reactor.core.scheduler.Schedulers
 
 @Service
-public class ShortURLService(private val shortURLRepository: ShortURLRepository) {
+class ShortURLService(private val shortURLRepository: ShortURLRepository) {
 
-    // Regular expresions
+    // Regular expresion
     private val REGEX_BRACKET = Regex("\\{[a-z]+\\}", setOf(RegexOption.IGNORE_CASE))
-    private val REGEX_VANITY = Regex("[a-z]+\\/(\\{[a-z]+\\})", setOf(RegexOption.IGNORE_CASE))
 
     @Value("\${google.safebrowsing.api_key}")
     var safeBrowsingKey: String? = null
@@ -50,21 +49,21 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
     @Autowired
     private val env: Environment? = null
 
-
     /**
-     * @param id is the id of the short url
-     * @returns the url with <<id>> id from the repository
+     * Returns the url with <<id>> from the database.
+     * @param id Id of the short url.
+     * @return The url with <<id>> id from the repository.
      */
-    public fun findByKey(id: String): Mono<ShortURL> = shortURLRepository.findByKey(id)
+    fun findByKey(id: String): Mono<ShortURL> = shortURLRepository.findByKey(id)
 
 
 
      /**
-     * saves the url in the database
-     * @param url is the url which is going to be stored
-     * @param vanity is the vanity of the url
+     * Saves the url in the database.
+     * @param url Url which is going to be stored.
+     * @param vanity Vanity of the url.
      */
-    public fun save(url: String, ip: String, vanity: String? = null): Mono<ShortURL> {
+    fun save(url: String, ip: String, vanity: String? = null): Mono<ShortURL> {
         // Valid URL
         val urlValidator = UrlValidator(arrayOf("http", "https"))
         // Check if the url is valid 
@@ -97,9 +96,9 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
 
 
     /**
-     * @param qrCodeText is the url shortened associated to the qr
-     * @param size is the size of the qr image width and height have the same dimension
-     * @returns a mono object with the qr image in Base64 String format
+     * @param qrCodeText The url shortened associated to the qr.
+     * @param size The size of the qr image width and height have the same dimension.
+     * @return Mono object with the qr image in Base64 String format.
      */
     fun generateQR(qrCodeText: String): Mono<String> {
         val result = Mono.fromSupplier { generateQRString(qrCodeText, 400) }
@@ -112,9 +111,11 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
 
 
     /**
-     * @param qrCodeText is the url shortened associated to the qr
-     * @param size is the size of the qr image width and height have the same dimension
-     * @returns the qr image in Base64 String format
+     * Generates and returns a QR image in Base64 string format
+     * of the text.
+     * @param qrCodeText Url shortened associated to the qr.
+     * @param size Size of the qr image width and height have the same dimension.
+     * @return QR image in Base64 String format.
      */
     @Cacheable("qrs", key = "#qrCodeText")
     fun generateQRString(qrCodeText: String, size: Int): String {
@@ -132,31 +133,34 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
 
 
     /**
-     * @param su is a url shortened
-     * @returns <<true>> if and only if the url shortened can be redirected 
-     *          (active and safe) and otherwise returns <<false>>
+     * Returns true if and only if the shortened url can be redirected.
+     * @param su Shortened url.
+     * @return true if and only if the url shortened can be redirected
+     *          (active and safe) and otherwise returns false
      */
-    public fun canRedirect(su: ShortURL): Boolean = su.active && su.safe!!
+    fun canRedirect(su: ShortURL): Boolean = su.active && su.safe!!
 
 
     /**
-     * @param su is a url shortened
-     * @returns a mono object with the result of checking the url 
-     *          with safe browsing service
+     * Returns a url with the result of checking the url with
+     * the safe browsing service.
+     * @param su Shortened url.
+     * @return Mono object with the result of checking the url
+     *          with safe browsing service.
      */
-    public fun checkSafeBrowsing(su: ShortURL): Mono<ShortURL> =
+    fun checkSafeBrowsing(su: ShortURL): Mono<ShortURL> =
         Mono.fromSupplier { safeBrowsing(su) }
         .filter(this::canRedirect)
         .flatMap(shortURLRepository::markGood)
 
 
     /**
-     * @param su is the url shortened
-     * @returns a url shortened safe
+     * Returns the url with its safeness.
+     * @param su Shortened url.
+     * @return Url with its safeness.
      */
     @Cacheable("safeURLs", key = "#su.id", unless = "!#result.safe")
     fun safeBrowsing(su: ShortURL): ShortURL {
-        simulateSlowService()
         val safeness = su.target?.let { isSafe(it) }
         su.safe = safeness
         su.active = safeness!!
@@ -165,8 +169,9 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
 
 
      /**
-     * @param url is the url which is going to be check if is safe
-     * @returns <<true>> if the url is safe and otherwise returns <<false>>
+      * Returns true if the url is safe or otherwise returns false.
+     * @param url Url which is going to be checked if it's safe.
+     * @return true if the url is safe or otherwise returns false.
      */
     fun isSafe(url: String): Boolean {
         // Check if the url is safe or not
@@ -183,17 +188,12 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
         return JSONObject(r.text).length() == 0
     }
 
-    // Debug purposes
-    private fun simulateSlowService() {
-        try {
-            // URL should not be accessible in the first 20 seconds
-            // afters 10s execute safe check
-            val time = 10000L
-            Thread.sleep(time)
-        } catch (e: InterruptedException) {}
-    }
-
-    public fun validateVanity(su: ShortURL): Mono<ShortURL> {
+    /**
+     * Validates the vanity of given shortened url.
+     * @param su Shortened url.
+     * @return Validated shortened url.
+     */
+    fun validateVanity(su: ShortURL): Mono<ShortURL> {
         val matchVanity = REGEX_BRACKET.findAll(su.id!!).toList()
         val matchUrl = REGEX_BRACKET.findAll(su.target!!).toList()
         if (matchVanity.count() > 0 && matchUrl.count() > 0) {
@@ -214,28 +214,47 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
         return Mono.just(su)
     }
 
-    @Scheduled(fixedRate = 600000) // 600 segundos
+    /**
+     * Checks every 600 seconds the safeness of the urls saved
+     * in the cache.
+     */
+    @Scheduled(fixedRate = 600000)
     fun reviewSafeURLs() {
+
+        // Create a connection with the Redis cache
         val port = env?.getProperty("spring.redis.port")
         var jedis = Jedis(env?.getProperty("spring.redis.host"), port!!.toInt())
+
+        // For each key in the redis server
         for (cachedString in jedis.keys("safeURLs::*")) {
+
+            // Obtain the associated url
             val parts = cachedString.split(":", limit = 3)
             val cachedId = parts[2]
             with(obtainUrl(cachedId)) {
-                println("Checking if the url $target is safe")
+
+                // If the associated url is not safe, remove the url from the cache
                 if (!target?.let { isSafe(it) }!!) {
                     target?.let { removeUrl(it) }
-                    println("The url $target is not safe")
                 }
             }
         }
     }
 
+    /**
+     * Returns the cached url identified with "id"
+     * @param id Identifier of the url
+     * @return cached url identified with "id"
+     */
     @Cacheable("safeURLs", key = "#id")
     fun obtainUrl(id: String): ShortURL {
         return ShortURL()
     }
 
+    /**
+     * Removes the cached url identified with "id"
+     * @param id Identifier of the url
+     */
     @CacheEvict("safeURLs", key = "#id")
     fun removeUrl(id: String) {
     }
