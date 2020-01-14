@@ -21,6 +21,7 @@ import urlshortener.domain.Click
 import urlshortener.repository.ClickRepository
 import urlshortener.exception.BadRequestError
 
+
 @Service
 class ClickService(private val clickRepository: ClickRepository) {
 

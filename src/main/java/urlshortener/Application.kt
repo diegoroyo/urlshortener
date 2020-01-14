@@ -27,9 +27,8 @@ import org.springframework.scheduling.annotation.EnableScheduling
 @EnableScheduling
 
 /**
- * Throw the application 
+ * Boots the application.
  */
-
 class Application() : SpringBootServletInitializer() {
     override fun configure(application: SpringApplicationBuilder): SpringApplicationBuilder {
         return application.sources(Application::class.java)

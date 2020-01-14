@@ -24,6 +24,7 @@ import urlshortener.domain.ShortURL
 import urlshortener.exception.ConflictError
 import urlshortener.repository.ShortURLRepository
 
+
 @Repository
 class ShortURLRepositoryImpl(val db: Database) : ShortURLRepository {
 

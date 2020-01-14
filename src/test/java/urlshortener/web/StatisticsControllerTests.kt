@@ -1,3 +1,14 @@
+/*
+ *******************************************
+ *** Urlshortener - Web Engineering ********
+ *** Authors: Name  ************************
+ *** Andrew Mackay - 737069 ****************
+ *** Ruben Rodríguez Esteban - 737215 ******
+ *** Diego Royo Meneses - 740388 ***********
+ *** Course: 2019 - 2020 *******************
+ *******************************************
+ */
+
 package urlshortener.web
 
 import org.junit.Assert.assertEquals
@@ -15,8 +26,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import urlshortener.domain.Click
-import urlshortener.domain.ShortURL
 import urlshortener.service.ClickService
 import urlshortener.service.ShortURLService
 import urlshortener.util.*

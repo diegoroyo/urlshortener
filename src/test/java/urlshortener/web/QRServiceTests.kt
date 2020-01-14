@@ -1,33 +1,25 @@
+/*
+ *******************************************
+ *** Urlshortener - Web Engineering ********
+ *** Authors: Name  ************************
+ *** Andrew Mackay - 737069 ****************
+ *** Ruben Rodríguez Esteban - 737215 ******
+ *** Diego Royo Meneses - 740388 ***********
+ *** Course: 2019 - 2020 *******************
+ *******************************************
+ */
+
 package urlshortener.web
 
-import org.junit.Before
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.Mockito.`when`
-import org.mockito.MockitoAnnotations
-import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.MvcResult
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl
-import org.springframework.test.web.servlet.setup.MockMvcBuilders
-import reactor.core.publisher.Mono
-import urlshortener.domain.ShortURL
-import urlshortener.service.ClickService
 import urlshortener.service.ShortURLService
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
-import java.net.URI
-import org.hamcrest.Matchers.`is`
-import org.hamcrest.Matchers.nullValue
 import org.junit.Test
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.`when`
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
 import org.junit.Assert.assertEquals
 import urlshortener.repository.ShortURLRepository
 import org.junit.runner.RunWith
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+
 
 @RunWith(SpringJUnit4ClassRunner::class)
 open class QRServiceTests {

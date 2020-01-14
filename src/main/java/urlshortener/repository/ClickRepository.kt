@@ -16,8 +16,8 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import urlshortener.domain.Click
 
-interface ClickRepository {
 
+interface ClickRepository {
 
     /**
      * Returns the clicks of the url.
@@ -26,7 +26,6 @@ interface ClickRepository {
      */
     fun findByShortURL(id: String, page: Pageable): Flux<Click>
 
-
     /**
      * Saves a click.
      * @param cl Click.
@@ -34,23 +33,17 @@ interface ClickRepository {
      */
     fun save(cl: Click): Mono<Click>
 
-
-
     /**
      * Update a click.
      * @param cl Click.
      */
     fun update(cl: Click): Mono<Void>
 
-
-
     /**
      * Deletes a click.
      * @param id Identifier of the click.
      */
     fun delete(id: Long): Mono<Void>
-
-
 
     /**
      * Returns the number of clicks.
