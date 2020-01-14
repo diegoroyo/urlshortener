@@ -23,6 +23,7 @@ import reactor.core.publisher.Mono
 import urlshortener.domain.Click
 import urlshortener.repository.ClickRepository
 
+
 @Repository
 class ClickRepositoryImpl(val db: Database) : ClickRepository {
 
@@ -41,8 +42,10 @@ class ClickRepositoryImpl(val db: Database) : ClickRepository {
     }
 
     /**
-     * @param id is the id of the url shortened
-     * @returns a url shortened from the database 
+     * Returns click by url with pages.
+     * @param id is the id of the url shortened.
+     * @param page Pageabe object.
+     * @return List of clicks of the url.
      */
     override fun findByShortURL(id: String, page: Pageable): Flux<Click> = Flux.from(
             db.select("SELECT * FROM click WHERE shortId=? LIMIT ? OFFSET ?")
@@ -52,8 +55,9 @@ class ClickRepositoryImpl(val db: Database) : ClickRepository {
         )
     
     /**
-     * @param icld is a click
-     * @returns a mono object with the click saved in the database
+     * Saves a click.
+     * @param cl Click to save.
+     * @return Mono object with the click saved in the database.
      */
     override fun save(cl: Click): Mono<Click> {
         cl.clickId = Mono.from(db.update(
@@ -67,8 +71,8 @@ class ClickRepositoryImpl(val db: Database) : ClickRepository {
     }
 
     /**
-     * @param icld is a click
-     * @returns a mono object with the click updated in the database
+     * @param cl is a click.
+     * @return Mono object with the click updated in the database.
      */
     override fun update(cl: Click): Mono<Void> = RxJava2Adapter.completableToMono(
         db.update(
@@ -79,15 +83,15 @@ class ClickRepositoryImpl(val db: Database) : ClickRepository {
     )
 
     /**
-     * Delete a click from the database
-     * @param id is the id of the click which is going to be deleted
+     * Delete a click from the database.
+     * @param id is the id of the click which is going to be deleted.
      */
     override fun delete(id: Long): Mono<Void> = RxJava2Adapter.completableToMono(db.update(
             "delete from click where clickId=?"
         ).parameters(id).complete())
 
     /**
-     * @returns a mono object with the number of clicks of the database
+     * @return Mono object with the number of clicks of the database.
      */
     override fun count(): Mono<Long> = Mono.from(db.select(
             "select count(*) from click"

@@ -48,8 +48,6 @@ class ClickBuilder {
         ip
     )
 
-
-
     /**
      * @param shortId is the id of the url
      * @return the click with the shorId stored
@@ -58,8 +56,6 @@ class ClickBuilder {
         this.shortId = shortId
         return this
     }
-
-
 
     /**
      * @param shortId is the id of the url
@@ -70,8 +66,6 @@ class ClickBuilder {
         return this
     }
 
-
-
     /**
      * @param referer is the id of the url
      * @return the click with the referer stored
@@ -80,8 +74,6 @@ class ClickBuilder {
         this.referer = referer
         return this
     }
-
-
 
     /**
      * @param browser is the id of the url
@@ -92,8 +84,6 @@ class ClickBuilder {
         return this
     }
 
-
-
     /**
      * @param platform is the id of the url
      * @return the click with the platform stored
@@ -103,8 +93,6 @@ class ClickBuilder {
         return this
     }
 
-
-    
     /**
      * @param ip is the id of the url
      * @return the click with the ip stored

@@ -16,8 +16,8 @@ import reactor.core.publisher.Mono
 import reactor.core.publisher.Flux
 import urlshortener.domain.ShortURL
 
-interface ShortURLRepository {
 
+interface ShortURLRepository {
 
      /**
       * Returns the saved shortened url with identifier "id".
@@ -26,8 +26,6 @@ interface ShortURLRepository {
       */
     fun findByKey(id: String): Mono<ShortURL>
 
-
-
      /**
       * Saves a shortened url and returns the same url.
      * @param su Shortened url to save.
@@ -35,14 +33,12 @@ interface ShortURLRepository {
      */
     fun save(su: ShortURL): Mono<ShortURL>
 
-
     /**
      * Marks the shortened url as good.
      * @param id is the id of the url.
      * @returns Mono object with the url marked as good.
      */
     fun markGood(su: ShortURL): Mono<ShortURL>
-
 
     /**
      * Marks the shortened url as malicious.
@@ -59,20 +55,17 @@ interface ShortURLRepository {
      */
     fun update(su: ShortURL): Mono<Void>
 
-
      /**
      * Deletes the shortened url with identifier "id"
      * @param id Id of the shortened url.
      */
     fun delete(id: String): Mono<Void>
 
-
     /**
      * Returns the number of urls.
      * @return number of urls.
      */
     fun count(): Mono<Long>
-
 
     /**
      * Returns the list of urls.

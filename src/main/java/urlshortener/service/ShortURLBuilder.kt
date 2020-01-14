@@ -17,6 +17,7 @@ import java.sql.Date
 import org.springframework.http.HttpStatus
 import urlshortener.domain.ShortURL
 
+
 class ShortURLBuilder {
 
     // Id of the url
