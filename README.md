@@ -18,9 +18,9 @@
 # 1 - Description 
 
 This repository is a gradle projet of a url shortener implemented in kotlin language. The url shortener has the following 
-functionalities to the users:
+functionalities:
 
-* The application optionally allows to the users to generate a QR code that redirects to the desired original URI.
+* The application optionally allows users to generate a QR code that redirects to the desired original URI.
 
 * The application allows the generation of shortened URIs customized by the users with a specified format.
 
@@ -28,7 +28,7 @@ functionalities to the users:
 
 * The application has a protection mechanism against DoS attacks, which limits the number of requests.
 
-* The application can display information about the status of the URIs stored in the system (QR, Safe Browsing, number of clicks
+* The application can display information about the status of the URIs stored in the system (QR, number of clicks
 among others).
 
 &nbsp;
@@ -48,7 +48,7 @@ The application can be run as follows:
 $ gradle bootRun
 ```
 
-After doing the last commands there will be a shortener service running at port 8080.
+After doing the last commands there will be a shortener service running on port 8080.
 
 &nbsp;
 
@@ -56,7 +56,7 @@ After doing the last commands there will be a shortener service running at port 
 # 3 - Tests and continuous integration
 
 In order to test the behaviour of the url shortener, there are tests that verify the performance of the application. These
-test are checked by Travis CI automatically and check the different functionalities of the application in all contexts and
+tests are run by Travis CI automatically and check the different functionalities of the application in all contexts and
 possible situations (cases of error and correct responses).
 
 &nbsp;
