@@ -22,7 +22,7 @@ import urlshortener.service.ShortURLService
 import urlshortener.util.*
 
 
-open class StatisticsServiceTests {
+open class StatisticsControllerTests {
 
     private var mockMvc: MockMvc? = null
 
