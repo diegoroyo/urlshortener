@@ -17,7 +17,7 @@
 
 # 1 - Description 
 
-This repository is a gradle projet of a url shortener implemented in kotlin language. The url shortener has the following 
+This repository is a gradle project of a url shortener implemented in Kotlin language. The url shortener has the following 
 functionalities:
 
 * The application optionally allows users to generate a QR code that redirects to the desired original URI.
