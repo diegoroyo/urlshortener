@@ -1,7 +1,19 @@
+/*
+ *******************************************
+ *** Urlshortener - Web Engineering ********
+ *** Authors: Name  ************************
+ *** Andrew Mackay - 737069 ****************
+ *** Ruben Rodríguez Esteban - 737215 ******
+ *** Diego Royo Meneses - 740388 ***********
+ *** Course: 2019 - 2020 *******************
+ *******************************************
+ */
+
 package urlshortener.util
 
 import urlshortener.domain.ShortURL
 import urlshortener.domain.Click
+
 
 /**
  * Creates a sample shortened url
