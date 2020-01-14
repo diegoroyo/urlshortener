@@ -101,8 +101,8 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
      * @param size is the size of the qr image width and height have the same dimension
      * @returns a mono object with the qr image in Base64 String format
      */
-    fun generateQR(qrCodeText: String, size: Int = 400): Mono<String> {
-        val result = Mono.fromSupplier { generateQRString(qrCodeText, size) }
+    fun generateQR(qrCodeText: String): Mono<String> {
+        val result = Mono.fromSupplier { generateQRString(qrCodeText, 400) }
             .subscribeOn(Schedulers.elastic())
             .timeout(Duration.ofSeconds(1L),
                 Mono.error<String>(ServiceUnavailableError("QR image termporarily unavailable"))).block()!!
@@ -117,7 +117,7 @@ public class ShortURLService(private val shortURLRepository: ShortURLRepository)
      * @returns the qr image in Base64 String format
      */
     @Cacheable("qrs", key = "#qrCodeText")
-    fun generateQRString(qrCodeText: String, size: Int = 400): String {
+    fun generateQRString(qrCodeText: String, size: Int): String {
         // Create the ByteMatrix for the QR-Code that encodes the given String
         val byteMatrix = QRCodeWriter().encode(qrCodeText, BarcodeFormat.QR_CODE, size, size)
         // Create object baos

@@ -38,7 +38,7 @@ import org.junit.Ignore
 
 @RunWith(SpringJUnit4ClassRunner::class)
 @TestPropertySource(locations = arrayOf("/application.properties"))
-open class SafeBrowsingTests{
+open class SaveServiceTests {
     
     private val VALID_URL = "https://example.com"
     private val MALWARE_URL = "https://testsafebrowsing.appspot.com/s/malware.html"
@@ -58,8 +58,7 @@ open class SafeBrowsingTests{
     }
 
     @Test
-    @Ignore // TODO quitar (evitar demasiadas peticiones)
-    @Throws(Exception::class)
+    @Ignore // Evitar demasiadas peticiones a la API
     open fun checkSafeURL() {
         val su = genURL("valid", VALID_URL)
         // Check service is able to detect safe url
@@ -69,8 +68,7 @@ open class SafeBrowsingTests{
     }
 
     @Test
-    @Ignore // TODO quitar (evitar demasiadas peticiones)
-    @Throws(Exception::class)
+    @Ignore // Evitar demasiadas peticiones a la API
     open fun checkUnsafeURL() {
         val su = genURL("malware", MALWARE_URL)
         // Check service is able to detect safe url

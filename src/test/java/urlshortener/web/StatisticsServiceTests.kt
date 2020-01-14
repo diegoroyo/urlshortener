@@ -42,12 +42,7 @@ open class StatisticsServiceTests {
     }
 
     @Test
-    @Throws(Exception::class)
     open fun testValidStatistics() {
-        // crear url y darle algunos clicks
-        // peticion a /manage/statistics
-        // - codigo 200, clicks correctos etc
-
         // Obtain an example URL
         val url = exampleURL()
 
@@ -65,7 +60,6 @@ open class StatisticsServiceTests {
         val invocations = mockingDetails(clickService).invocations
 
         // Compare the number of invocations to the number of requests
-        // TODO: specific invocations?
         assertEquals(3, invocations.size)
 
         // Return the example Click flux instead of loading it from the database
@@ -80,11 +74,7 @@ open class StatisticsServiceTests {
     }
 
     @Test
-    @Throws(Exception::class)
     open fun testInvalidStatistics() {
-        // peticion a /manage/statistics con url incorrecta
-        // - codigo 400
-
         // Obtain an example URL
         val url = exampleURL()
 

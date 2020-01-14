@@ -18,7 +18,7 @@ import org.mockito.Mockito
 
 
 @RunWith(SpringJUnit4ClassRunner::class)
-open class UrlShortenerVanityTests {
+open class VanityServiceTests {
 
     @Mock
     private val shortUrlRepository: ShortURLRepository? = null
@@ -32,7 +32,6 @@ open class UrlShortenerVanityTests {
     private fun <T> any(type: Class<T>): T = Mockito.any<T>(type)
 
     @Test
-    @Throws(Exception::class)
     open fun saveValidVanity() {
         // Save valid URL with vanity
         val su = exampleURL()
@@ -43,7 +42,6 @@ open class UrlShortenerVanityTests {
     }
 
     @Test(expected=ConflictError::class)
-    @Throws(Exception::class)
     open fun saveInvalidVanity() {
         // Save invalid URL with vanity
         val su = exampleURL()

@@ -24,6 +24,7 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import urlshortener.domain.Click
 import urlshortener.domain.ShortURL
+import urlshortener.exception.BadRequestError
 import urlshortener.exception.ConflictError
 import urlshortener.exception.NotFoundError
 import urlshortener.service.ClickService
@@ -55,7 +56,6 @@ class UrlShortenerController(private val shortUrlService: ShortURLService, priva
     ): Mono<ShortURL> {
         if (vanity.isNullOrEmpty()) {
             return try {
-
                 // Check if the URL exists
                 val hash = Hashing.murmur3_32().hashString(url, StandardCharsets.UTF_8).toString()
 
@@ -68,7 +68,6 @@ class UrlShortenerController(private val shortUrlService: ShortURLService, priva
             }
         } else {
             return try {
-
                 // Check if vanity exists
                 val savedURLMono = shortUrlService.findByKey(vanity)
                 val savedURL = savedURLMono.block()!!
@@ -133,11 +132,15 @@ class UrlShortenerController(private val shortUrlService: ShortURLService, priva
      */
     @GetMapping("/manage/qr")
     fun generateQr(
-        @RequestParam(value = "url", required = true)
-        @Pattern(regexp = "^http://\$serverIp:\$serverPort/.*") url: String
+        @RequestParam(value = "url", required = true) url: String
     ): Mono<String> {
-        shortUrlService.findByKey(url.substring("http://$serverIp:$serverPort/".length)).block()!!
-        return shortUrlService.generateQR(url)
+        val regexQR = Regex("^http://$serverIp:$serverPort/.*")
+        if (regexQR.containsMatchIn(url)) {
+            shortUrlService.findByKey(url.substring("http://$serverIp:$serverPort/".length))
+            return shortUrlService.generateQR(url)
+        } else {
+            throw BadRequestError("Invalid URL format")
+        }
     }
 
 

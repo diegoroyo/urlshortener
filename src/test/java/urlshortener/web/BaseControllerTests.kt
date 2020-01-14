@@ -23,7 +23,7 @@ import urlshortener.service.ClickService
 import urlshortener.util.*
 
 
-open class UrlShortenerBaseTests {
+open class BaseControllerTests {
 
     private var mockMvc: MockMvc? = null
 
@@ -43,28 +43,7 @@ open class UrlShortenerBaseTests {
     }
 
     @Test
-    @Throws(Exception::class)
-    // TODO quitar este test cuando terminemos
-    open fun redireccionExito() {
-
-        // Create a random URL
-        val url = exampleURL()
-
-        // When the find function is called return the example URL
-        `when`(shortUrlService!!.findByKey(url.id!!)).thenReturn(Mono.just(url))
-        mockMvc!!.perform(get("/{id}", url.id)).andDo(print())
-                .andExpect(status().isTemporaryRedirect)
-                .andExpect(redirectedUrl(url.target!!))
-    }
-
-    @Test
-    @Throws(Exception::class)
     open fun saveValidURL() {
-        // guardar en POST / (sin vanity)
-        // - codigo 201, respuesta correcta
-        // ver que la redirección es correcta
-        // - codigo 307, redirecciona a una url correcta
-
         // Creates a random URL
         val url = exampleURL()
 
@@ -85,13 +64,7 @@ open class UrlShortenerBaseTests {
     }
 
     @Test
-    @Throws(Exception::class)
     open fun saveInvalidURL() {
-        // POST / (sin vanity) con varias URL con formato inválido
-        // - todas devuelven código 400
-        // ver que la redirección es correcta
-        // - código 404 ya que las URL son inválidas y no se guardan
-
         // Creates a random URL
         val url = exampleURL()
 
