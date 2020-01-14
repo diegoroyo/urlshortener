@@ -29,13 +29,13 @@ class ClickService(private val clickRepository: ClickRepository) {
 
 
     /**
-     * Stores the click in the database
-     * @param shortId
-     * @param clickIp
-     * @param referer
-     * @param browser
-     * @param platform
-     * @return a mono object which represents the click created
+     * Stores the click in the database.
+     * @param shortId Identifier of the url.
+     * @param clickIp IP of the click.
+     * @param referer Referer of the click.
+     * @param browser Browser of the click.
+     * @param platform Platform of the click.
+     * @return Mono object which represents the click created.
      */
     fun saveClick(
         shortId: String,
@@ -53,20 +53,19 @@ class ClickService(private val clickRepository: ClickRepository) {
         return Mono.just(cl)
     }
 
-
-
      /**
-     * get clicks from a click with a specific parameters
-     * @param shortId
-     * @param pageNumber
-     * @param pageSize
-     * @returns the number of clicks
+     * Returns the clicks from a url.
+     * @param shortId Identifier of the url.
+     * @param pageNumber Number of pages.
+     * @param pageSize Size of each page.
+     * @returns Clicks from a url.
      */
     fun getClicksFromURL(
         shortId: String,
         pageNumber: Int,
         pageSize: Int
     ): Flux<Click> {
+        // If the number of pages or size of page is negative, throw an exception
         if (pageNumber < 0 || pageSize < 0) {
             throw BadRequestError("Invalid page")
         }

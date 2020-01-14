@@ -174,10 +174,11 @@ class UrlShortenerController(private val shortUrlService: ShortURLService, priva
 
     /**
      * Returns the statistics for the URL with vanity "short".
-     * @Param short Vanity of the URL
-     * @Param pageNumber Number of pages
-     * @Param pageSize Size of pages
-     * @Return Statistics of the URL and status 200.
+     * @Param short Vanity of the URL.
+     * @Param pageNumber Number of pages.
+     * @Param pageSize Size of pages.
+     * @Return Statistics of the URL and status 200 or 400 if
+     * the number of pages or size of pages is invalid.
      */
     @GetMapping("/manage/statistics")
     fun getStatistics(

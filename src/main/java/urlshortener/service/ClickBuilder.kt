@@ -19,18 +19,23 @@ class ClickBuilder {
 
     // Id of the url clicked
     private var shortId: String? = null
+
     // Date when the url is accesed
     private var created: Date? = null
+
     // Posible referer of the url
     private var referer: String? = null
+
     // client broswer where the url is accesed
     private var browser: String? = null
+
     // Operating system
     private var platform: String? = null
+
     // Ip
     private var ip: String? = null
 
-    /*
+    /**
      * Constructor 
      */
     fun build() = Click(
@@ -45,7 +50,7 @@ class ClickBuilder {
 
 
 
-    /*
+    /**
      * @param shortId is the id of the url
      * @return the click with the shorId stored
      */
@@ -56,7 +61,7 @@ class ClickBuilder {
 
 
 
-    /*
+    /**
      * @param shortId is the id of the url
      * @return the click with the shorId stored
      */
@@ -67,7 +72,7 @@ class ClickBuilder {
 
 
 
-    /*
+    /**
      * @param referer is the id of the url
      * @return the click with the referer stored
      */
@@ -78,7 +83,7 @@ class ClickBuilder {
 
 
 
-    /*
+    /**
      * @param browser is the id of the url
      * @return the click with the browser stored
      */
@@ -89,7 +94,7 @@ class ClickBuilder {
 
 
 
-    /*
+    /**
      * @param platform is the id of the url
      * @return the click with the platform stored
      */
@@ -100,7 +105,7 @@ class ClickBuilder {
 
 
     
-    /*
+    /**
      * @param ip is the id of the url
      * @return the click with the ip stored
      */

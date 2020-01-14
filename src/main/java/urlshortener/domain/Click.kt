@@ -20,6 +20,7 @@ import javax.validation.constraints.Size
  * Class that represents an object click
  */
 data class Click(
+
     // Id
     var clickId: Int? = null,
     @Size(max = 256)

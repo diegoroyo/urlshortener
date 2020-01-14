@@ -20,38 +20,41 @@ interface ClickRepository {
 
 
     /**
-     * @param id is the id of the click
-     * @param page is the pageable page
+     * Returns the clicks of the url.
+     * @param id Id of the url.
+     * @param page Pageable object.
      */
     fun findByShortURL(id: String, page: Pageable): Flux<Click>
 
 
     /**
-     * @param cl is a click
-     * @returns a mono object with the click saved
+     * Saves a click.
+     * @param cl Click.
+     * @returns Mono object with the click saved.
      */
     fun save(cl: Click): Mono<Click>
 
 
 
     /**
-     * update a click
-     * @param cl is a click
+     * Update a click.
+     * @param cl Click.
      */
     fun update(cl: Click): Mono<Void>
 
 
 
     /**
-     * delete a click
-     * @returns a mono with the click removed
+     * Deletes a click.
+     * @param id Identifier of the click.
      */
     fun delete(id: Long): Mono<Void>
 
 
 
     /**
-     * @returns the number of clicks
+     * Returns the number of clicks.
+     * @returns the number of clicks.
      */
     fun count(): Mono<Long>
 }
